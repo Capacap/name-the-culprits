@@ -1,0 +1,99 @@
+/* The game view's strip: every figure at one scale (--frame, the height of
+   a whole 2:3 frame, zoomed per guest so the heads come out one size),
+   panels with no box and no room behind the figures, every panel one height
+   and every text the column's width. */
+
+:root {
+  --col: min(720px, 100% - 2.4rem); --wide: min(960px, 100% - 1.2em);
+  --frame: clamp(390px, 50vh, 640px);
+  --figfade: 50%;       /* how far in from each side a figure fades out */
+}
+/* From 700px the slot signs hang left of the words (about 42px at 18px
+   type), so the margins hold them. The column's margin is in rem, so a line
+   in a larger type is no narrower than the rest. */
+@media (min-width: 700px) { :root { --col: min(720px, 100% - 6rem); --wide: min(960px, 100% - 4em); } }
+
+#log { position: fixed; inset: 0; overflow-y: auto; padding: 2.4em 0 0; }
+#log > * { width: var(--col); margin-left: auto; margin-right: auto; }
+#log > .panel { width: var(--wide); }
+#log > h2 { margin-top: 2.6em; font-size: 26px; }
+#spacer { height: 30vh; }
+
+/* A panel is no box: the figures stand on the page, near its middle and
+   never mirrored, since every guest looks at the viewer. */
+.panel { position: relative; overflow: hidden; transition: filter 0.6s, opacity 0.5s; margin: 1.4em auto 0.9em; }
+#log .panel { height: calc(var(--frame) * 0.56); }
+.panel img.fig { position: absolute; display: block; height: var(--frame); width: auto;
+  transform: scale(var(--zoom, 1)); transform-origin: 50% 0;
+  mask-image: linear-gradient(to right, transparent, #000 var(--figfade), #000 calc(100% - var(--figfade)), transparent); }
+.panel.new, .pair.new { opacity: 0; }
+.past.panel, .pair.past .panel { filter: brightness(0.45) saturate(0.6); }
+.panel .caption { position: absolute; z-index: 2; left: 0.9em; bottom: 0.7em; font: 600 15px "Cinzel", serif; letter-spacing: 0.12em; color: var(--gold); text-shadow: 0 1px 4px #000; }
+.panel .caption svg { vertical-align: -3px; color: var(--gold); }
+
+/* An account: a wide panel of the speaker alone, on alternating sides, the
+   words under it as wide as the text column. The block spans #log and its
+   panel is --wide inside it, so --col resolves against #log for these
+   words as for every entry. */
+#log > .pair.solo { width: 100%; margin: 1.4em auto 0.6em; transition: opacity 0.5s; }
+.solo > .panel { width: var(--wide); margin: 0 auto 0.9em; }
+.solo .fig { top: 0; }
+.solo .fig.a { left: 36%; translate: -50% 0; }
+.solo .fig.b { left: 64%; translate: -50% 0; }
+.solo > .body { width: var(--col); margin: 0 auto; padding: 0; }
+.pair .entry { margin-bottom: 0.6em; }
+
+/* A day opens on the house, where the bodies lay marked, Veronique beside. */
+.panel.house .lay { position: absolute; z-index: 1; left: 4%; top: 50%; translate: 0 -50%; width: 66%; }
+.panel.house .map { width: 100%; filter: drop-shadow(0 4px 12px #000); }
+.panel.house .caption { position: static; margin-top: 0.6em; text-align: center; color: var(--red); }
+.panel.house .fig { right: 3%; top: 2%; }
+.panel.bow .fig { left: 50%; top: 2%; translate: -50% 0; }
+
+/* An examination: the dead as a grey headshot at the left, the examiner
+   grave at the right. A headshot is the square around a head in a picture
+   framed like the portrait, --hx, --hy and --hside in the picture's 1024
+   by 1536 (cast.js head()), shown --hs wide. */
+.panel .behind { position: absolute; inset: 0; display: flex; justify-content: flex-start; align-items: center; gap: 4%; padding-left: 14%; }
+.panel .head { --hs: calc(var(--frame) * 0.56 * 0.62); width: var(--hs); height: var(--hs); flex: none; border-radius: 6px;
+  background-repeat: no-repeat; background-size: calc(var(--hs) * 1024 / var(--hside)) auto;
+  background-position: calc((var(--hside) / 2 - var(--hx)) * var(--hs) / var(--hside)) calc((var(--hside) / 2 - var(--hy)) * var(--hs) / var(--hside));
+  box-shadow: 0 0 0 1px rgba(207, 167, 94, 0.35), 0 6px 18px #000; }
+.panel.examination .head { filter: grayscale(1) brightness(0.75); opacity: 0.85; }
+.panel.examination .fig { right: 18%; top: 1%; }
+/* Two bodies in one examination: smaller headshots nearer the edge and the
+   examiner further right, so the second headshot is not under the figure. */
+.panel.examination:has(.head + .head) .behind { padding-left: 4%; gap: 3%; }
+.panel.examination:has(.head + .head) .head { --hs: calc(var(--frame) * 0.56 * 0.5); }
+.panel.examination:has(.head + .head) .fig { right: 4%; }
+
+/* A charge: the accused's headshot at the left, the accuser pointing at it
+   from the right, so the arm points toward the accused; the words are in
+   the text under it. */
+.panel.charge .head { filter: brightness(0.9); }
+.panel.charge .fig { right: 14%; top: 1%; }
+#log > .entry.charge { text-align: center; margin-top: -0.2em; }
+#log > .entry.charge .who { margin-bottom: 0.15em; }
+
+#log > .entry.answer { margin-top: 0.8em; margin-bottom: 1.6em; }
+/* A defence that ends an account answering a charge stays close to it. */
+#log > .entry.answer:has(+ .entry.defence) { margin-bottom: 0; }
+#log > .entry.answer + .entry.defence { margin-bottom: 1.6em; }
+
+/* Her lines set as the guests' are, in their type, size and gutter, with
+   no box; only the colour stays hers. */
+#log > .entry.narrator { font: inherit; font-style: normal; color: #b8604f; background: none; border-left: 0; padding: 0; }
+#log .entry.narrator .slotsign { position: absolute; width: 1.9em; margin-right: 0; vertical-align: baseline; }
+
+@media (max-width: 699px) {
+  :root { --col: calc(100% - 1.6rem); --wide: 100%; --frame: min(86vw, 52vh); }
+  /* The house is laid out in flow and may hold a rule's pictures under the
+     map, so it grows from the panels' height. */
+  #log .panel.house { height: auto; min-height: calc(var(--frame) * 0.56); padding: 0.8em 0 0.6em; }
+  .panel.house .lay { position: relative; left: auto; top: auto; translate: none; width: 92%; margin: 0 auto; }
+  .panel.house .fig { display: none; }
+  /* On a phone two headshots stack at the left, smaller. */
+  .panel.examination:has(.head + .head) .behind { flex-direction: column; justify-content: center; align-items: flex-start; gap: 3%; }
+  .panel.examination:has(.head + .head) .head { --hs: calc(var(--frame) * 0.56 * 0.42); }
+  #log .entry.narrator .slotsign { position: static; width: auto; vertical-align: -1px; margin-right: 0.3em; }
+}

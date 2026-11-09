@@ -1,0 +1,20 @@
+:root { --gold: #c9a45c; --red: #e2493b; --dim: #9a8b76; color-scheme: dark; }
+* { box-sizing: border-box; }
+body { margin: 0; min-height: 100vh; background: radial-gradient(ellipse at 50% 0%, #2a1a12 0%, #0e0a08 60%); color: #e8dcc8; font: 17px/1.5 "Libre Caslon Text", Georgia, serif; }
+main { max-width: 760px; margin: 0 auto; padding: 3em 1.2em 4em; text-align: center; }
+h1 { margin: 0; font: 700 clamp(2.4em, 8vw, 3.6em) "Cinzel", serif; letter-spacing: 0.08em; color: var(--red); }
+.lede { margin: 0.6em auto 1.8em; max-width: 30em; color: var(--dim); font-style: italic; }
+.random { padding: 0.8em 2.4em; cursor: pointer; background: var(--gold); color: #140d09; border: 1px solid var(--gold); font: 700 1.05em "Cinzel", serif; letter-spacing: 0.12em; }
+.random:hover { background: #dcb873; }
+.left { min-height: 1.5em; margin: 0.6em 0 0; color: var(--dim); font-size: 0.85em; }
+.alpha { margin: 0.2em 0 1.8em; color: var(--dim); font-size: 0.75em; }
+.stories { display: grid; grid-template-columns: repeat(auto-fill, minmax(88px, 1fr)); gap: 0.5em; margin: 0; padding: 0; list-style: none; }
+.stories a { display: flex; flex-direction: column; align-items: center; min-height: 5.2em; padding: 0.55em 0.2em 0.45em; text-decoration: none; color: inherit; background: #15100c; border: 1px solid #3a2f22; }
+.stories a:hover { border-color: var(--gold); }
+.stories b { font: 700 1.25em "Cinzel", serif; color: var(--gold); }
+.stories span { font-size: 0.75em; color: var(--dim); text-align: center; }
+.stories em { margin-top: 0.15em; font: normal 0.7em "Cinzel", serif; letter-spacing: 0.08em; color: var(--dim); }
+.stories a.played { opacity: 0.6; }
+.stories a.solved { opacity: 0.6; border-color: #4f6b3a; }
+.stories a.solved em { color: #9cc27a; }
+.stories a.revealed { opacity: 0.6; border-color: #5a4a36; }

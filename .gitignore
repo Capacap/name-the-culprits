@@ -1,0 +1,11 @@
+# The story library and the pictures are not kept here (README.md). Both
+# names are links on the machine that builds the site, and a line with a
+# trailing slash would not match a link.
+/stories
+/art
+node_modules/
+__pycache__/
+dist/
+# what wrangler writes beside its config
+.wrangler/
+.dev.vars*

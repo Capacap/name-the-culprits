@@ -1,0 +1,11 @@
+/* A pronoun's small type in a dossier's head line. */
+.dossier small { font-weight: 400; color: var(--dim); font-size: 12px; }
+
+/* The dock over the strip. */
+.ui-dock #log { padding-bottom: 6em; }
+.ui-dock .next.quiet ~ #spacer { height: calc(30vh + 5em); }
+.ui-dock .finale, .ui-dock .entry, .ui-dock .line { scroll-margin-bottom: 7em; }
+/* With the notes open the story keeps clear of them: left of the column,
+   or scrolling past the strip. */
+body.noting.notes-side #log { right: var(--notes-w); }
+body.noting:not(.notes-side) #log { padding-bottom: calc(6em + var(--notes-h)); }

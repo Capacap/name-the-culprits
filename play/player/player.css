@@ -1,0 +1,260 @@
+/* The player, which the game view places. Veronique's
+   voice, a line's slot signs and marks, the game's tools (the rules,
+   heads, the accusation), the dock with its card and the rules told in
+   play. Red is truth only: her words, the rules
+   and what she says of the dead. A charge, a mark, a pick or a verdict is
+   set in type, bone or gold. */
+
+:root { --her: "Playfair Display"; --her-weight: 500; }
+
+/* Veronique speaks in captions, in her own face (--her). */
+.entry.narrator { font-family: var(--her), serif; font-weight: var(--her-weight); padding: 0.5em 0.9em 0.6em 0.9em; position: relative;
+  background: linear-gradient(90deg, rgba(90, 12, 8, 0.28), rgba(90, 12, 8, 0.06)); border-left: 2px solid var(--blood); }
+
+/* A line that names a slot: its sign hangs centred in a gutter before it,
+   wide enough for two, and the slot's word is set bold. */
+.entry .line { position: relative; }
+.slotsign { position: absolute; left: -2.05em; width: 1.9em; top: 0.28em; display: inline-flex; justify-content: center; gap: 1px; color: var(--gold); }
+.slotsign svg { display: block; }
+.entry.narrator .slotsign { position: static; width: auto; vertical-align: -1px; margin-right: 0.35em; color: var(--red); }
+.slotword { font-weight: 700; color: #e8d3a6; }
+.entry.narrator .slotword { color: inherit; }
+@media (max-width: 699px) { .slotsign { position: static; width: auto; vertical-align: -1px; margin-right: 0.3em; } }
+
+/* A charge's shout in its own face, in the speaker's colour. */
+.entry.charge .text { color: inherit; }
+
+/* A line a charge is about, in the accuser's account and the accused's:
+   a dotted underline (a doubted line's is wavy). */
+.line.disputed { text-decoration: underline dotted rgba(207, 167, 94, 0.8); text-decoration-thickness: 2px; text-underline-offset: 5px; }
+
+/* A line of an account marked from its speaker's mark (data-auto): a
+   suspect's doubted (a wavy underline), a cleared guest's trusted (a green
+   rule). */
+:root { --doubt: rgba(232, 220, 200, 0.6); }
+.marking .line[data-auto="doubt"] { text-decoration: underline wavy var(--doubt); text-underline-offset: 4px; }
+.marking .line[data-auto="trust"] { border-left-color: #8fae8c; }
+
+/* The game's tools. */
+.rules section { margin: 0 0 0.9em; }
+.rules h4 { margin: 0 0 0.2em; font: 700 13px "Cinzel", serif; letter-spacing: 0.14em; color: var(--gold); }
+.rules p { margin: 0 0 0.25em; font-size: 15px; line-height: 1.45; color: var(--red); }
+img.head { display: block; object-fit: cover; object-position: 50% 14%; }
+img.head[src*="/icon/"] { object-position: 50% 50%; }
+.marks { display: inline-flex; gap: 0.4em; }
+.mk { font: 600 11px "Cinzel", serif; letter-spacing: 0.1em; padding: 0.15em 0.6em; cursor: pointer; color: var(--dim); background: none; border: 1px solid #3a2f22; }
+.mk.suspect.on { color: var(--ink); background: var(--bone); border-color: var(--bone); }
+.mk.cleared.on { color: #120d0a; background: #8fae8c; border-color: #8fae8c; }
+textarea.page { display: block; width: 100%; margin-top: 0.4em; padding: 0.4em 0.5em; resize: vertical;
+  font: 15px/1.4 "Libre Caslon Text", serif; color: var(--bone); background: #0f0b09; border: 1px solid #3a2f22; }
+[data-mark="suspect"] img.head { outline: 2px solid var(--bone); outline-offset: -2px; }
+[data-mark="cleared"] img.head { outline: 2px solid #8fae8c; outline-offset: -2px; }
+.dead img.head { filter: grayscale(1) brightness(0.55); }
+
+/* The accusation: the cast's heads to pick, the seal, the verdict. */
+.accuse .pick { display: grid; grid-template-columns: repeat(auto-fill, minmax(78px, 1fr)); gap: 0.5em; }
+.accuse .pick .who { padding: 0; cursor: pointer; background: none; border: 1px solid #3a2f22; color: var(--bone); font: 700 13px "Libre Caslon Text", serif; }
+.accuse .pick .who img { width: 100%; aspect-ratio: 3 / 4; }
+.accuse .pick .who span { display: block; padding: 0.2em 0; }
+.accuse .pick .who.dead img { filter: grayscale(1) brightness(0.55); }
+.accuse .pick .who.on { border-color: var(--gold); box-shadow: 0 0 0 2px var(--gold); }
+.accuse .pick .who.on img { filter: none; }
+.accuse .pick .who.dead.on img { filter: grayscale(1) brightness(0.8); }
+.sealbtn, .sendbtn { display: block; margin: 0.9em auto 0; padding: 0.5em 1.4em; cursor: pointer; font: 700 14px "Cinzel", serif; letter-spacing: 0.16em;
+  color: var(--ink); background: var(--gold); border: 1px solid var(--gold); }
+.sealbtn:disabled, .sendbtn:disabled { opacity: 0.35; cursor: default; }
+/* Her panel on each sealed team and on the truth opened (tools.js): her
+   captions as in the log, a day's title over its sentences. */
+.herpanel { margin: 1.2em 0 0; text-align: left; }
+.herpanel .entry.answer { margin: 0 0 0.6em; }
+.herpanel .call { font-weight: 700; }
+.herpanel .panel { height: calc(var(--frame) * 0.56); margin: 0 0 0.8em; }
+.herpanel.right .call { color: var(--gold); }
+.herpanel .entry .line + .line { margin-top: 0.8em; }
+.herpanel .entry .line.quote + .line.quote { margin-top: 0.2em; }
+.herpanel .daytitle { display: block; font: 600 12px "Cinzel", serif; font-style: normal; letter-spacing: 0.14em; color: var(--gold); }
+.opentruth { all: unset; display: block; margin: 1em auto 0; cursor: pointer; font: 600 13px "Cinzel", serif; letter-spacing: 0.14em; color: var(--dim); }
+.opentruth:hover { color: var(--gold); }
+/* Her ask after the truth (feedback.js): the three steps in a row, the
+   hearts as the accusation's tiles, the text box and one button. */
+.herpanel.ask .steps { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.5em; margin: 0 0 1.2em; }
+.herpanel.ask .steps .mk { padding: 0.35em 0.9em; }
+.herpanel.ask .steps .mk.on { color: var(--ink); background: var(--gold); border-color: var(--gold); }
+.herpanel.ask .pick { margin: 0 0 1.2em; }
+.herpanel.ask .pick .who.on span::before { content: "\2665  "; color: var(--gold); }
+.herpanel.ask textarea.page { min-height: 4em; }
+.onward { text-align: center; margin: 0.9em 0 0.2em; }
+.onward a { font: 600 13px "Cinzel", serif; letter-spacing: 0.14em; color: var(--gold); }
+
+/* The dock. */
+.dock { position: fixed; left: 0; right: 0; bottom: 0; z-index: 23; display: flex; align-items: flex-end; justify-content: center; gap: 1.2em;
+  padding: 0.35em 0.8em 0.4em; background: var(--ink); border-top: 1px solid #241c15; }
+.dock .heads { display: flex; gap: 0.3em; overflow-x: auto; }
+/* A head is a button, framed as the accusation's tiles are. */
+.dock .g { flex: none; width: 56px; padding: 0; cursor: pointer; background: none; border: 1px solid #3a2f22; color: var(--dim); font: 11px "Libre Caslon Text", serif; }
+.dock .g img.head { width: 54px; height: 54px; }
+.dock .g span { display: block; padding: 0.1em 0 0.15em; }
+.dock .g:hover { border-color: #7a6340; }
+.dock .g.on span, .dock .g:hover span { color: var(--gold); }
+.dock .g.on { border-color: var(--gold); box-shadow: 0 0 0 1px var(--gold); }
+.dock .ends { display: flex; gap: 0.4em; padding-bottom: 1.2em; }
+.dock .end { padding: 0.35em 0.8em; cursor: pointer; font: 600 12px "Cinzel", serif; letter-spacing: 0.14em; color: var(--dim); background: var(--ink); border: 1px solid #3a2f22; }
+.dock .end.on, .dock .end:hover { color: var(--gold); border-color: var(--gold); }
+.dock .accuseb { color: var(--gold); border-color: #7a6340; }
+.dossier { position: fixed; left: 50%; bottom: 5.4em; z-index: 22; width: min(760px, 96vw); max-height: 62vh; overflow-y: auto; padding: 1em 1.2em;
+  translate: -50% 0; border: 1px solid #3a2f22; box-shadow: 0 -10px 30px #000; display: none;
+  /* A gold glow at the foot while more lies below; the local cover hides it at the end. */
+  background: linear-gradient(to top, #0e0a08 40%, rgba(14, 10, 8, 0)) center bottom / 100% 44px no-repeat local,
+    radial-gradient(farthest-side at 50% 100%, rgba(207, 167, 94, 0.45), rgba(207, 167, 94, 0)) center bottom / 100% 16px no-repeat scroll,
+    #0e0a08; }
+body.carded .dossier { display: block; }
+.dossier .close { position: absolute; top: 0.4em; right: 0.6em; font-size: 22px; }
+.dossier .close, .notes-pane .close { color: var(--dim); background: none; border: none; cursor: pointer; }
+.dossier .close:hover, .notes-pane .close:hover { color: var(--gold); }
+.dossier h3 { margin: 0 0 0.3em; font: 700 18px "Cinzel", serif; letter-spacing: 0.12em; color: var(--gold); }
+.dossier .file { font-size: 15px; }
+/* A dossier's head line: head, name and pronouns, state, mark; it wraps on a narrow screen. */
+.dossier .top { display: flex; flex-wrap: wrap; align-items: center; gap: 0.3em 0.8em; margin: 0 2em 0.7em 0; }
+.dossier .top img.head { width: 48px; height: 48px; }
+.dossier .top h3 { margin: 0; }
+.dossier .status { color: var(--bone); font-style: italic; }
+.dossier .status.alive { color: var(--dim); }
+.dossier h4 { margin: 1em 0 0.3em; font: 700 12px "Cinzel", serif; letter-spacing: 0.14em; color: var(--dim); }
+.dossier blockquote { margin: 0 0 0.6em; padding: 0.3em 0.7em; border-left: 2px solid #4a3b2a; }
+.dossier blockquote:hover { border-left-color: var(--gold); }
+.dossier blockquote cite { display: block; font: 600 11px "Cinzel", serif; letter-spacing: 0.12em; color: var(--gold); font-style: normal; }
+.dossier blockquote .line { display: block; }
+/* A dossier's quotes keep a gutter for the slot signs, as the log does. */
+.dossier blockquote.said { padding-left: 2.3em; }
+.dossier blockquote.said cite { margin-left: -1.6em; }
+.dossier .line { position: relative; }
+.dossier .slotsign { left: -1.95em; width: 1.7em; top: 0.22em; }
+@media (max-width: 699px) {
+  .dock { gap: 0.4em; padding: 0.3em 0.4em; }
+  .dock .g { width: 36px; }
+  .dock .g img.head { width: 34px; height: 34px; }
+  .dock .g span { display: none; }
+  .dock .ends { flex-direction: column; padding-bottom: 0; gap: 0.2em; }
+  .dock .end { padding: 0.25em 0.4em; font-size: 10px; }
+  /* The slot signs stand inline here, so a dossier's quotes need no gutter. */
+  .dossier blockquote.said { padding-left: 0.7em; }
+  .dossier blockquote.said cite { margin-left: 0; }
+  .dossier .slotsign { width: auto; }
+}
+/* On a narrow screen a card is a modal, over everything, the page dimmed. */
+.scrim { display: none; }
+@media (max-width: 799px) {
+  body.carded .scrim { display: block; position: fixed; inset: 0; z-index: 29; background: rgba(0, 0, 0, 0.72); }
+  .dossier { z-index: 30; left: 0.6em; right: 0.6em; top: 50%; bottom: auto; width: auto; max-height: 84vh; translate: 0 -50%;
+    padding: 1em 1em 1.2em; box-shadow: 0 10px 50px #000; }
+  .dossier .close { top: 0; right: 0; width: 44px; height: 44px; }
+}
+
+/* The accusation as the story's last part, the challenge said above it. */
+.finale { margin: 1em auto 2em; padding: 1em 0; border-top: 1px solid #3a2f22; }
+.workspace .finale .accuse .pick .who span { font-size: 15px; padding: 0.3em 0; }
+
+/* On a phone the cast's tiles are square, so both rows and the seal fit
+   under her challenge. */
+@media (max-width: 799px) { .finale .accuse .pick .who img { aspect-ratio: 1; } }
+
+.rules.ref h4 { margin: 0 0 0.3em; font: 700 14px "Cinzel", serif; letter-spacing: 0.16em; color: var(--gold); }
+.dossier .hint { margin: -0.2em 0 0.8em; color: var(--dim); font-size: 13px; }
+
+/* The notes pane, open beside the card (workspace.js says where it stands). */
+.notes-pane { position: fixed; z-index: 21; display: none; flex-direction: column; padding: 0.3em 0.9em 0.6em;
+  left: 0; right: 0; bottom: var(--dock); height: var(--notes-h);
+  background: #0e0a08; border-top: 1px solid #3a2f22; box-shadow: 0 -10px 30px #000; }
+body.noting .notes-pane { display: flex; }
+.notes-pane .bar { display: flex; align-items: center; justify-content: space-between; flex: none; }
+.notes-pane .bar span { font: 700 12px "Cinzel", serif; letter-spacing: 0.14em; color: var(--dim); }
+.notes-pane .close { font-size: 20px; line-height: 1; padding: 0 0.2em; }
+.notes-pane textarea.page { flex: 1 1 auto; min-height: 4em; height: auto; margin: 0.2em 0 0; resize: none; border: none; padding: 0.2em 0; background: none; }
+.notes-pane textarea.page:focus { outline: none; }
+/* The grip on the pane's inner edge: its top as a strip, its left as a column. */
+.notes-pane .grip { position: absolute; left: 0; right: 0; top: -4px; height: 9px; cursor: ns-resize; touch-action: none; }
+.notes-pane .grip::after { content: ""; position: absolute; left: 50%; top: 3px; width: 44px; height: 3px; translate: -50% 0; border-radius: 2px; background: #4a3b2a; }
+.notes-pane .grip:hover::after { background: var(--gold); }
+@media (min-width: 800px) {
+  body.ui-dock.noting:not(.notes-side) .dossier { bottom: calc(var(--dock) + var(--notes-h) + 0.6em); max-height: calc(100vh - var(--dock) - var(--notes-h) - 2em); }
+}
+body.notes-side .notes-pane { left: auto; top: 0; width: var(--notes-w); height: auto; border-top: none; border-left: 1px solid #3a2f22; box-shadow: -10px 0 30px #000; padding-top: 0.9em; }
+body.notes-side .notes-pane .grip { inset: 0 auto 0 -4px; width: 9px; height: auto; cursor: ew-resize; }
+body.notes-side .notes-pane .grip::after { left: 3px; top: 50%; width: 3px; height: 44px; translate: 0 -50%; }
+body.ui-dock.noting.notes-side .dossier { left: calc((100% - var(--notes-w)) / 2); width: min(760px, 100% - var(--notes-w) - 2em); }
+.rules.ref { font-size: 17px; }
+/* The rules card: the house's own rules lead, and each section's heading
+   stands beside its rules. */
+.rules.ref { display: flex; flex-direction: column; }
+.rules.ref .own { order: -1; padding-bottom: 0.4em; }
+.rules.ref .every { display: block; margin: 0.6em 0 0.7em; padding-top: 0.7em; border-top: 1px solid #3a2f22;
+  font: 600 11px "Cinzel", serif; letter-spacing: 0.16em; text-transform: uppercase; color: var(--dim); }
+.rules.ref section { display: grid; grid-template-columns: 8.4em 1fr; column-gap: 1em; margin-bottom: 1.1em; }
+.rules.ref section h4 { grid-row: 1 / span 9; text-align: right; padding-top: 0.25em; line-height: 1.3; }
+@media (max-width: 559px) {
+  .rules.ref section { display: block; }
+  .rules.ref section h4 { text-align: left; }
+}
+.dossier blockquote > * { cursor: pointer; }
+.dossier blockquote .charge { margin: 0.35em 0 0.35em -1.6em; padding-left: 0.6em; border-left: 2px solid #4a3b2a; }
+.dossier blockquote .charge .by { font: 600 11px "Cinzel", serif; letter-spacing: 0.12em; color: var(--dim); }
+.dossier blockquote .charge.against .by { color: var(--bone); }
+.dossier blockquote .charge .shout { margin: 0.05em 0 0; font: 900 19px/1.15 "Grenze Gotisch", serif; color: var(--bone); }
+.dossier .housecard #pop { position: static; width: auto; opacity: 1; pointer-events: auto; border: none; box-shadow: none; background: none; padding: 0; }
+
+/* The notice on the Rules button while the rules are new. */
+.dock .end { position: relative; }
+.dock .end .notice { position: absolute; right: 0; bottom: calc(100% + 9px); padding: 0.35em 0.7em; white-space: nowrap; pointer-events: none;
+  font: italic var(--her-weight) 14px var(--her), serif; letter-spacing: 0; text-transform: none; color: var(--red);
+  background: #120807; border: 1px solid var(--blood); box-shadow: 0 4px 16px #000; animation: notice 2.4s ease-in-out infinite; }
+.dock .end .notice::after { content: ""; position: absolute; right: 1.4em; top: 100%; border: 6px solid transparent; border-top-color: var(--blood); }
+@keyframes notice { 50% { transform: translateY(-3px); } }
+/* On a phone the tools stand in a column at the right, so the notice
+   points at its button from the left. */
+@media (max-width: 799px) {
+  .dock .end .notice { right: calc(100% + 9px); bottom: auto; top: 50%; transform: translateY(-50%); animation: none; }
+  .dock .end .notice::after { right: auto; left: 100%; top: 50%; margin-top: -6px; border-top-color: transparent; border-left-color: var(--blood); }
+}
+
+/* Her answer to an underlined word: a caption of hers (.reply), with the
+   rule drawn; the card's rows (.qa) open the same way. */
+.reply { margin-bottom: 0.9em; }
+.reply .asked { margin: 0.1em 0 0.35em; text-align: right; font: italic 16px/1.4 "Libre Caslon Text", serif; color: var(--gold); }
+.reply .entry.answer { margin-bottom: 0; }
+.entry.answer .drawn { margin-top: 0.5em; }
+.entry.answer svg.picture, .qa svg.picture { display: block; max-width: 100%; height: auto; }
+.press { all: unset; cursor: pointer; color: var(--gold); }
+.press::after { content: ""; display: inline-block; width: 5px; height: 5px; margin: 0 1px 0 2px; border-radius: 50%; vertical-align: 0.55em; background: var(--gold); }
+.press:hover { color: var(--bone); }
+.press.asked { cursor: default; color: inherit; }
+.press.asked::after { content: none; }
+.qa { margin: 0 0 0.75em; }
+.qa .q { all: unset; display: block; cursor: pointer; font: italic 15px/1.4 "Libre Caslon Text", serif; color: var(--gold); }
+.qa .q:hover { color: var(--bone); }
+.qa .a { margin: 0.1em 0 0; font: italic var(--her-weight) 17px/1.45 var(--her), serif; color: var(--red); }
+.qa .drawn { display: none; margin-top: 0.4em; }
+.qa.open .drawn { display: block; }
+.rules.ref section .qa { grid-column: 2; }
+/* The follow-up's answer: the rule as cited, in the rules' type, and her
+   telling; the same under a question opened in the card (also rules-play's
+   card rows). */
+.reply.follow .text .cited, .qa .drawn .cited { margin: 0 0 0.4em; font: 17px/1.45 "Libre Caslon Text", serif; font-style: normal; color: var(--red); }
+.reply.follow .text .more, .qa .drawn .more { margin: 0; font: italic var(--her-weight) 16px/1.45 var(--her), serif; color: var(--red); opacity: 0.85; }
+/* Rules in play (rules-play.js): an underlined word of hers, a shade brighter
+   than her line, starts or continues a chain; once pressed it is plain. */
+.rules-play .press { color: #c97566; text-decoration: underline 1px rgba(207, 167, 94, 0.75); text-underline-offset: 0.22em; }
+.rules-play .press::after { content: none; }
+.rules-play .entry.current .press { color: #ff8a73; }
+.rules-play .press:hover { color: var(--gold); text-decoration-color: var(--gold); }
+.rules-play .press.asked, .rules-play .press.spent { color: inherit; text-decoration: none; cursor: default; }
+/* A guest's or a room's name she underlines keeps the name's colour, as it
+   does in a guest's line; the underline alone says it can be pressed. */
+.rules-play :is(.room-name, .guest-name) > .press, .rules-play .entry.current :is(.room-name, .guest-name) > .press { color: inherit; }
+
+/* While a kept reading plays back (save.js), nothing fades in or moves. */
+body.restoring *, body.restoring *::before, body.restoring *::after { transition: none !important; animation: none !important; }
+
+/* A team named twice, and a closed accusation. */
+.verdict .again { color: var(--dim); font: italic 15px "Libre Caslon Text", serif; letter-spacing: 0; }
+.accuse.closed .pick .who { cursor: default; }
+.accuse.closed .sealbtn { display: none; }

@@ -1,0 +1,84 @@
+/* The game's ink, the log's type, the house map and continue. */
+
+:root {
+  --bone: #efe6d6;
+  --dim: #9b8f7e;
+  --blood: #c4271d;
+  --red: #e2493b;
+  --gold: #cfa75e;
+  --navy: #9fc0ee;
+  --ink: #080605;
+}
+* { box-sizing: border-box; scrollbar-width: thin; scrollbar-color: #4a3b2a transparent; }
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #4a3b2a; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #7a6340; }
+html, body { height: 100%; margin: 0; overflow: hidden; background: var(--ink); color: var(--bone); }
+body { font: 18px/1.55 "Libre Caslon Text", serif; }
+
+.log h2 { font: 700 20px "Cinzel", serif; letter-spacing: 0.18em; color: var(--gold); text-align: center; margin: 1.6em 0 0.5em; }
+.entry { margin: 0 0 0.9em; color: #9f9484; transition: color 0.3s; }
+.entry.current { color: var(--bone); }
+.entry .who { font: 700 13px "Cinzel", serif; letter-spacing: 0.16em; color: var(--gold); }
+.entry .line { display: block; padding: 0.05em 0.4em; margin-left: -0.4em; border-left: 2px solid transparent; }
+.entry .line[data-slots]:hover { border-left-color: var(--gold); background: rgba(207, 167, 94, 0.1); }
+.entry.narrator { font: italic 500 20px/1.45 var(--her), serif; color: #a8574b; }
+.entry.narrator.current { color: var(--red); }
+.entry.narrator .who { color: var(--blood); }
+.entry.charge .text { font: 900 30px/1.1 "Grenze Gotisch", serif; color: var(--blood); }
+.guest-name { font-weight: 700; color: var(--navy); }
+.room-name { font-weight: 700; color: var(--gold); }
+.entry.charge .guest-name { color: inherit; font-weight: inherit; }
+
+.legend-row { display: flex; justify-content: center; font-size: 13px; color: var(--dim); }
+.legend-row .legend { white-space: pre; }
+svg.map { width: 100%; height: auto; display: block; }
+/* Rooms opaque, so the hallways drawn centre to centre under them show
+   only between the walls. */
+.map rect { fill: rgb(28, 22, 18); stroke: #8a7048; stroke-width: 4; }
+.map .halls .wall { stroke: #8a7048; stroke-width: 26; }
+.map .halls .floor { stroke: rgb(20, 15, 12); stroke-width: 18; }
+.map .cuts rect { fill: rgb(20, 15, 12); stroke: none; }
+/* A room with a rule of its own (the Chapel, a feature) in violet, which a
+   lit room's gold and a body's red cover. */
+.map :is(.graveyard, .feature) rect { fill: #211a2c; stroke: #8b77b4; }
+.map :is(.graveyard, .feature) text.name { fill: #cdbdf0; }
+.map .lit rect { fill: #4a3320; stroke: var(--gold); stroke-width: 4; }
+/* A door an account walks through: gold walls and the lit room's floor. */
+.map .halls .wall.lit { stroke: var(--gold); }
+.map .halls .floor.lit { stroke: #4a3320; }
+.map .cuts rect.lit { fill: #4a3320; }
+.map text.name { fill: var(--bone); font: 700 15px "Libre Caslon Text", serif; text-anchor: middle; dominant-baseline: middle; }
+.map .when { color: var(--gold); }
+.map.big text.name { font-size: 23px; }
+.map.big text.dead { font-size: 19px; }
+.map .body rect { fill: #3a0d09; stroke: var(--red); stroke-width: 4; }
+/* A violet room's name turns bone where gold or red covers the room. */
+.map :is(.lit, .body) text.name { fill: var(--bone); }
+.map text.dead { fill: var(--red); font: italic 600 13px "Libre Caslon Text", serif; text-anchor: middle; dominant-baseline: middle; }
+
+
+@media (max-width: 899px) { body { font-size: 16px; } }
+
+.shake { animation: shake 0.45s; }
+@keyframes shake {
+  20% { translate: -9px 3px; } 40% { translate: 8px -4px; }
+  60% { translate: -5px 2px; } 80% { translate: 3px -1px; }
+}
+
+/* Continue, a quiet line of text at the log's end. */
+.next.quiet {
+  display: block; margin: 0.6em auto 0; padding: 0.4em 1.2em; background: none; border: none; cursor: pointer;
+  font: 600 14px "Cinzel", serif; letter-spacing: 0.3em; text-transform: lowercase; color: var(--dim);
+  animation: breathe 2.6s ease-in-out infinite;
+}
+.next.quiet::after { content: " \25BE"; }
+.next.quiet:hover { color: var(--gold); }
+.next.quiet:disabled { display: none; }
+@keyframes breathe { 50% { opacity: 0.45; } }
+#pop {
+  position: fixed; top: 2.6em; right: 0.9em; z-index: 19; width: min(560px, calc(100vw - 1.8em)); padding: 0.6em 0.8em 0.8em;
+  background: rgba(8, 6, 5, 0.94); border: 1px solid #3a2f22; box-shadow: 0 8px 30px #000;
+  opacity: 0; pointer-events: none; transition: opacity 0.2s;
+}

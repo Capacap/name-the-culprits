@@ -1,0 +1,21 @@
+// The site: one Worker (worker/index.js) serving the built frontend from
+// dist/ and writing the alpha's signals and feedback to D1. README.md says
+// how to run it locally and deploy it.
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "loose-threads",
+  "main": "worker/index.js",
+  "compatibility_date": "2026-11-08",
+  "assets": {"directory": "dist", "binding": "ASSETS"},
+  "d1_databases": [{
+    "binding": "DB",
+    "database_name": "loose-threads",
+    // The id `npx wrangler d1 create loose-threads` prints. Any string serves
+    // the local database, which is keyed by it: change it and the local
+    // schema must be applied again.
+    "database_id": "11da2d22-81fe-4c23-9924-a93ea7bd474d"
+  }],
+  // Errors reach the dashboard; no per-request log is kept, so no address
+  // or agent of a player is stored anywhere.
+  "observability": {"enabled": true, "logs": {"invocation_logs": false}}
+}

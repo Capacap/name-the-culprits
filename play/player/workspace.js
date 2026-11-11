@@ -7,8 +7,10 @@
 //     player's page) in a pane of its own beside it; N, R and H open the
 //     three, Esc closes the card, then the notes. The dock's height is the
 //     root's --dock.
-//   A line of an account is marked from its speaker's mark: a suspect's
-//     lines doubted, a cleared guest's trusted.
+//   A line of an account is marked from its speaker's mark for that day: a
+//     suspect's or a culprit's lines doubted, a cleared guest's trusted.
+//     The marks are set beside each account (story.js), and stand as a
+//     table over her challenge.
 //   Before the challenge she closes the rules, and the accusation follows
 //     it in the log, the cast in two rows; continue moves up to follow the
 //     last turn, and its press brings the challenge into view.
@@ -52,12 +54,13 @@ export function mount(ctx) {
   addEventListener("keydown", e => {
     if ([" ", "Enter", "ArrowRight"].includes(e.key) && !e.target.closest?.("textarea, input, select")) take(e);
   }, true);
-  // Marks on the lines of accounts, from the speaker's mark (data-auto).
+  // Marks on the lines of accounts, from the speaker's mark for the
+  // account's day, or their culprit mark (data-auto).
   const AUTO = {suspect: "doubt", cleared: "trust"};
   function lines(entry) {
     if (!entry.classList.contains("account")) return;
     entry.querySelectorAll(".line").forEach(line => {
-      const draw = () => { line.dataset.auto = AUTO[t.notes.guest[entry.dataset.speaker]] || ""; };
+      const draw = () => { const who = entry.dataset.speaker; line.dataset.auto = t.culprit(who) ? "doubt" : AUTO[t.markOf(+entry.dataset.day, who)] || ""; };
       t.watchers.push(draw);
       draw();
     });
@@ -134,7 +137,7 @@ export function mount(ctx) {
 
   const draw = () => heads.querySelectorAll(".g").forEach(g => {
     g.classList.toggle("dead", !!t.examined(g.dataset.id));
-    g.dataset.mark = t.notes.guest[g.dataset.id] || "";
+    g.dataset.mark = t.culprit(g.dataset.id) ? "culprit" : "";
   });
   t.watchers.push(draw);
   // An open dossier is rebuilt after each step, where it was scrolled to.
@@ -147,14 +150,13 @@ export function mount(ctx) {
   });
   draw();
 
-  // A guest's dossier: their head, name, pronouns, state and mark on one
-  // line, then what they have said.
+  // A guest's dossier: their head, name, pronouns and state on one line,
+  // then what they have said.
   function dossier(id) {
     const d = t.examined(id), pron = story.cast.find(c => c.id === id).pronouns;
     const top = el("div", {class: "top"}, t.head(id),
       el("h3", {}, names[id], el("small", {}, ` ${pron}`)),
-      el("span", {class: `status ${d ? "examined" : "alive"}`}, d ? `Examined on day ${d}` : "Alive"),
-      t.markButtons(id));
+      el("span", {class: `status ${d ? "examined" : "alive"}`}, d ? `Examined on day ${d}` : "Alive"));
     return el("div", {class: "file"}, top, ...told(id));
   }
   // What they have said and the charges they made or met, a day at a
@@ -229,7 +231,7 @@ export function mount(ctx) {
   ctx.on("end", entry => {
     const remind = el("div", {class: "entry narrator"}, el("div", {class: "who"}, "Veronique"),
       el("div", {class: "text"}));
-    entry.before(remind);
+    entry.before(remind, t.markTable());
     teacher.closing(remind);
     // Continue follows the last turn, above her bow's picture where a view
     // draws one (the beat's anchor).

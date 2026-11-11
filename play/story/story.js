@@ -6,6 +6,7 @@
 //   An account is a wide panel of the speaker alone, on alternating sides,
 //     under it the house lit with the way the account walks that day, then
 //     their words. The map is the same on every screen and covers no art.
+//     Beside the speaker's name stand the player's marks for them.
 //   An examination is a wide panel: the examiner grave, the dead a grey
 //     headshot beside them.
 //   A charge is a wide panel, the accused's headshot and the accuser
@@ -53,6 +54,10 @@ const aimed = [];             // what the last step added or grew, for the camer
 let beat = null;              // the latest beat, which a continuing turn joins
 const blocks = [];            // every panel, for lighting by day
 
+// The player's marks for the speaker beside their name on an account:
+// suspect or cleared for that day, culprit for the whole story (tools.js).
+const marks = (entry, turn, day) => entry.querySelector(".who")?.append(ctx.tools.markChips(day, turn.speaker));
+
 function row(b) {
   side = 1 - side;
   const p = el("div", {class: "pair solo new"});
@@ -64,6 +69,7 @@ function row(b) {
   log.insertBefore(p, b.entry);
   body.append(b.entry);
   p.append(pn, accountMap(b.turn, b.day), body);
+  marks(b.entry, b.turn, b.day);
   blocks.push(p);
   return {block: p, col: body};
 }
@@ -147,6 +153,7 @@ const r = reader({
       const map = accountMap(turn, beat.day);
       map.classList.add("answer");
       entry.before(map);
+      marks(entry, turn, beat.day);
       aimed.push(map);
       return;
     }

@@ -23,13 +23,16 @@ export function tools(ctx) {
     const b = ctx.beats.find(b => b.turn.kind === "examination" && (b.turn.bodies || []).includes(id));
     return b ? b.day : 0;
   }
-  // The player's notes, kept per story: a mark per guest and a page of
-  // their own. Notes kept by earlier versions also hold a memo per guest and
-  // marks on lines, which nothing reads now and are written back as found.
+  // The player's notes, kept per story: for each day a mark per guest
+  // (`day`, suspect or cleared), the guests marked culprit for the whole
+  // story (`culprit`), and a page of their own. Notes kept by earlier
+  // versions also hold one mark per guest for the whole story (`guest`), a
+  // memo per guest and marks on lines, which nothing reads now and are
+  // written back as found.
   const KEY = `berndle-notes-${STORY}`;
   let kept = {};
   try { kept = JSON.parse(localStorage.getItem(KEY) || "{}"); } catch { /* storage blocked: notes last the visit */ }
-  const notes = {guest: {}, page: "", ...kept};
+  const notes = {day: {}, culprit: [], page: "", ...kept};
   const keep = () => { try { localStorage.setItem(KEY, JSON.stringify(notes)); } catch { /* storage blocked */ } };
   const watchers = [];
   // A watcher returning false is gone (its card was rebuilt) and is dropped.
@@ -37,17 +40,51 @@ export function tools(ctx) {
     keep();
     for (const f of [...watchers]) if (f() === false) watchers.splice(watchers.indexOf(f), 1);
   }
-  const MARKS = ["suspect", "cleared"];
+  const MARKS = ["cleared", "suspect"];
+  // A guest's mark on a day ("" for none), and whether the player marked
+  // them a culprit, which holds on every day.
+  const markOf = (day, id) => notes.day[day]?.[id] || "";
+  const culprit = id => notes.culprit.includes(id);
 
-  // A guest's mark as two small toggles.
-  function markButtons(id) {
+  // A guest's marks beside an account of theirs: cleared and suspect for
+  // that day, and culprit, set apart, for the whole story.
+  function markChips(day, id) {
     const box = el("span", {class: "marks"});
-    const draw = () => { if (!box.isConnected) return false; box.querySelectorAll("button").forEach(b => b.classList.toggle("on", notes.guest[id] === b.dataset.mark)); };
     for (const m of MARKS) {
       const b = el("button", {class: `mk ${m}`, "data-mark": m}, m);
-      b.onclick = e => { e.stopPropagation(); notes.guest[id] = notes.guest[id] === m ? undefined : m; save(); };
+      b.onclick = e => { e.stopPropagation(); (notes.day[day] ||= {})[id] = markOf(day, id) === m ? undefined : m; save(); };
       box.append(b);
     }
+    const c = el("button", {class: "mk culprit", title: "For the whole story"}, "culprit");
+    c.onclick = e => { e.stopPropagation(); notes.culprit = culprit(id) ? notes.culprit.filter(x => x !== id) : [...notes.culprit, id]; save(); };
+    box.append(c);
+    const draw = () => {
+      box.querySelectorAll("[data-mark]").forEach(b => b.classList.toggle("on", markOf(day, id) === b.dataset.mark));
+      c.classList.toggle("on", culprit(id));
+    };
+    watchers.push(draw);
+    draw();
+    return box;
+  }
+  // The player's marks to read before the accusation: a column for each
+  // guest under their head, a row for each day. It shows nothing while no
+  // mark is set.
+  function markTable() {
+    const days = story.days.length;
+    const grid = el("div", {class: "grid"});
+    grid.style.gridTemplateColumns = `auto repeat(${guests.length}, 1fr)`;
+    grid.append(el("span", {}), ...guests.map(id => el("span", {class: "mh", "data-id": id}, head(id), el("span", {}, names[id]))));
+    const cells = [];
+    for (let d = 1; d <= days; d++) {
+      grid.append(el("b", {class: "md"}, `Day ${d}`));
+      for (const id of guests) { const c = el("i", {class: "cell"}); cells.push([c, d, id]); grid.append(c); }
+    }
+    const box = el("section", {class: "marktable"}, el("p", {}, "Your marks, day by day."), grid);
+    const draw = () => {
+      for (const [c, d, id] of cells) { const m = markOf(d, id); c.dataset.mark = m; c.dataset.short = m ? m[0].toUpperCase() : ""; c.textContent = m || "\u2013"; }
+      for (const h of grid.querySelectorAll(".mh")) h.classList.toggle("culprit", culprit(h.dataset.id));
+      box.hidden = !notes.culprit.length && !cells.some(([c]) => c.dataset.mark);
+    };
     watchers.push(draw);
     draw();
     return box;
@@ -98,7 +135,7 @@ export function tools(ctx) {
         say.replaceChildren(...(sealable() === "again" ? [el("p", {class: "again"}, "You have named this team already.")] : []));
       };
     }
-    const draw = () => row.querySelectorAll(".who").forEach(x => x.classList.toggle("dead", !!examined(x.dataset.id)));
+    const draw = () => row.querySelectorAll(".who").forEach(x => { x.classList.toggle("dead", !!examined(x.dataset.id)); x.classList.toggle("culprit", culprit(x.dataset.id)); });
     watchers.push(draw);
     ctx.on("step", draw);
     draw();
@@ -267,5 +304,5 @@ export function tools(ctx) {
   const ORDINAL = ["first", "second", "third", "fourth", "fifth", "sixth", "seventh"];
   const check = async team => hex(await sha(seedOf(team))) === story.check;
 
-  return {guests, examined, notes, save, watchers, markButtons, page, head, scrollTo, accusation};
+  return {guests, examined, notes, save, watchers, markOf, culprit, markChips, markTable, page, head, scrollTo, accusation};
 }

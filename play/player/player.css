@@ -41,14 +41,45 @@
 .rules p { margin: 0 0 0.25em; font-size: 15px; line-height: 1.45; color: var(--red); }
 img.head { display: block; object-fit: cover; object-position: 50% 14%; }
 img.head[src*="/icon/"] { object-position: 50% 50%; }
-.marks { display: inline-flex; gap: 0.4em; }
-.mk { font: 600 11px "Cinzel", serif; letter-spacing: 0.1em; padding: 0.15em 0.6em; cursor: pointer; color: var(--dim); background: none; border: 1px solid #3a2f22; }
+/* The player's marks beside an account's speaker: cleared and suspect for
+   the day, culprit, set apart, for the whole story. Green is cleared, bone
+   suspect and gold culprit; red stays the truth's. */
+.marks { display: inline-flex; gap: 0.35em; margin-left: 0.9em; vertical-align: 1px; }
+.mk { font: 600 10.5px "Cinzel", serif; letter-spacing: 0.1em; text-transform: uppercase; padding: 0.15em 0.6em; cursor: pointer; color: var(--dim); background: none; border: 1px solid #4a3b2a; }
+.mk.culprit { margin-left: 0.9em; }
 .mk.suspect.on { color: var(--ink); background: var(--bone); border-color: var(--bone); }
 .mk.cleared.on { color: #120d0a; background: #8fae8c; border-color: #8fae8c; }
+.mk.culprit.on { color: #120d0a; background: var(--gold); border-color: var(--gold); }
+@media (max-width: 699px) { .marks { margin-left: 0.7em; } .mk { padding: 0.3em 0.6em; } }
+/* The marks as a table over her challenge: a column for each guest, a row
+   for each day. On a narrow screen a cell holds the mark's first letter. */
+.marktable { margin: 1.6em auto 1.2em; }
+.marktable[hidden] { display: none; }
+.marktable p { margin: 0 0 0.6em; text-align: center; font-size: 14px; color: var(--dim); }
+.marktable .grid { display: grid; gap: 4px; align-items: center; }
+.marktable .mh { min-width: 0; border: 2px solid #3a2f22; font-size: 12px; text-align: center; color: var(--bone); }
+.marktable .mh img.head { width: 100%; aspect-ratio: 1; }
+.marktable .mh span { display: block; overflow: hidden; text-overflow: ellipsis; padding: 2px 0; }
+.marktable .mh.culprit { border-color: var(--gold); }
+.marktable .mh.culprit span { color: #120d0a; background: var(--gold); }
+.marktable .md { font: 700 11px "Cinzel", serif; letter-spacing: 0.1em; text-transform: uppercase; color: var(--dim); padding-right: 6px; white-space: nowrap; }
+.marktable .cell { font: 700 10.5px "Cinzel", serif; letter-spacing: 0.08em; text-transform: uppercase; font-style: normal; color: #5d5142; text-align: center; padding: 0.35em 0.1em; border: 1px solid #2a2118; }
+.marktable .cell[data-mark="cleared"] { background: #8fae8c; color: #120d0a; border-color: #8fae8c; }
+.marktable .cell[data-mark="suspect"] { background: var(--bone); color: #120d0a; border-color: var(--bone); }
+@media (max-width: 699px) {
+  .marktable .grid { gap: 2px; }
+  .marktable .mh span { font-size: 9px; }
+  .marktable .md { font-size: 9px; padding-right: 2px; }
+  .marktable .cell { font-size: 0; padding: 0; height: 20px; line-height: 18px; }
+  .marktable .cell::before { content: attr(data-short); font-size: 11px; }
+}
+/* A guest the player marked culprit, on the accusation's tile and the dock. */
+.accuse .pick .who.culprit:not(.on) { border-color: var(--gold); border-style: dashed; }
+.accuse .pick .who.culprit span { color: var(--gold); }
+.accuse .pick .who.culprit span::after { content: " \00b7  culprit"; font: 700 10px "Cinzel", serif; letter-spacing: 0.1em; text-transform: uppercase; }
 textarea.page { display: block; width: 100%; margin-top: 0.4em; padding: 0.4em 0.5em; resize: vertical;
   font: 15px/1.4 "Libre Caslon Text", serif; color: var(--bone); background: #0f0b09; border: 1px solid #3a2f22; }
-[data-mark="suspect"] img.head { outline: 2px solid var(--bone); outline-offset: -2px; }
-[data-mark="cleared"] img.head { outline: 2px solid #8fae8c; outline-offset: -2px; }
+[data-mark="culprit"] img.head { outline: 2px solid var(--gold); outline-offset: -2px; }
 .dead img.head { filter: grayscale(1) brightness(0.55); }
 
 /* The accusation: the cast's heads to pick, the seal, the verdict. */
@@ -113,7 +144,7 @@ body.carded .dossier { display: block; }
 .dossier .close:hover, .notes-pane .close:hover { color: var(--gold); }
 .dossier h3 { margin: 0 0 0.3em; font: 700 18px "Cinzel", serif; letter-spacing: 0.12em; color: var(--gold); }
 .dossier .file { font-size: 15px; }
-/* A dossier's head line: head, name and pronouns, state, mark; it wraps on a narrow screen. */
+/* A dossier's head line: head, name and pronouns, state; it wraps on a narrow screen. */
 .dossier .top { display: flex; flex-wrap: wrap; align-items: center; gap: 0.3em 0.8em; margin: 0 2em 0.7em 0; }
 .dossier .top img.head { width: 48px; height: 48px; }
 .dossier .top h3 { margin: 0; }

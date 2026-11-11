@@ -1,10 +1,10 @@
 // The library: a button that offers the next case by days from this
 // browser's progress (a one-day case until one is solved, then two days,
-// then three and more), a random short and a random long story, and under
-// them every story in stories/index.json, numbered in its order, labelled
-// short or long with its days and marked from the progress (played, solved
-// and in how many accusations, or the truth opened), behind tabs for all,
-// short and long that are kept across visits.
+// then three and more), and under it every story in stories/index.json,
+// numbered in its order, labelled with its days and marked from the
+// progress (played, solved and in how many accusations, or the truth
+// opened), behind a tab for each day count, kept across visits, with a
+// button that opens one of the shown stories at random.
 import {progress} from "./progress.js";
 
 const GAME = "story/?story=";
@@ -18,12 +18,11 @@ addEventListener("pageshow", e => { if (e.persisted) location.reload(); });
 const {stories} = await (await fetch("../stories/index.json")).json();
 const done = progress();
 
-// A short story tells one or two days.
-const length = s => s.days <= 2 ? "short" : "long";
-const TABS = ["short", "long"];
-const KEPT = "loose-threads-library-tab";
+// A tab for each day count the library holds.
+const TABS = [...new Set(stories.map(s => s.days))].sort((a, b) => a - b);
+const KEPT = "loose-threads-library-days";
 let tab = null;
-try { tab = localStorage.getItem(KEPT); } catch { /* storage refused */ }
+try { tab = Number(localStorage.getItem(KEPT)) || null; } catch { /* storage refused */ }
 if (!TABS.includes(tab)) tab = null;
 
 const open = pool => { location.href = GAME + pool[Math.floor(Math.random() * pool.length)].id; };
@@ -49,19 +48,13 @@ if (step) {
   document.getElementById("nextline").textContent = step.line;
   next.onclick = () => open(draw(step.kind));
 }
-for (const kind of TABS) {
-  const b = document.getElementById(`random-${kind}`);
-  const pool = draw(s => length(s) === kind);
-  b.hidden = !pool.length;
-  b.onclick = () => open(pool);
-}
 
 const list = document.getElementById("stories");
 const tiles = stories.map((s, i) => {
   const a = document.createElement("a");
   a.href = GAME + s.id;
   a.className = done[s.id]?.state || "";
-  a.innerHTML = `<b>${i + 1}</b><span>${length(s) === "short" ? "Short" : "Long"}<br>${plural(s.days, "day")}</span>`;
+  a.innerHTML = `<b>${i + 1}</b><span>${plural(s.days, "day")}</span>`;
   if (done[s.id]) a.insertAdjacentHTML("beforeend", `<em>${label(done[s.id])}</em>`);
   const li = document.createElement("li");
   li.append(a);
@@ -71,7 +64,7 @@ const tiles = stories.map((s, i) => {
 
 const left = document.getElementById("left");
 function show() {
-  const shown = s => !tab || length(s) === tab;
+  const shown = s => !tab || s.days === tab;
   stories.forEach((s, i) => { tiles[i].hidden = !shown(s); });
   const here = stories.filter(shown), fresh = here.filter(s => !done[s.id]);
   left.textContent = fresh.length === here.length ? `${here.length} ${here.length === 1 ? "story" : "stories"}`
@@ -80,7 +73,7 @@ function show() {
 const bar = document.getElementById("tabs");
 for (const option of [null, ...TABS]) {
   const b = document.createElement("button");
-  b.textContent = option || "all";
+  b.textContent = option ? plural(option, "day") : "all";
   b.setAttribute("aria-pressed", String(tab === option));
   b.onclick = () => {
     tab = option;
@@ -91,6 +84,7 @@ for (const option of [null, ...TABS]) {
   bar.append(b);
 }
 show();
+document.getElementById("random").onclick = () => open(draw(s => !tab || s.days === tab));
 
 const ours = stories.map(s => done[s.id]).filter(Boolean);
 const solved = ours.filter(r => r.state === "solved"), opened = ours.filter(r => r.state === "revealed");

@@ -36,9 +36,10 @@ function fit(t, line, size, room, weight = "700") {
 // rooms are taller with larger names, a name of two words on two lines, so
 // they stay legible at a phone's width. With `trim` the picture is cut to
 // the house's own width, so a narrow house is drawn larger. Returns show(turn), which lights the
-// way the turn's account walks all day: the rooms it names with a sign for
-// each slot it puts its speaker there, the rooms passed between them unnamed
-// without one, and the doors walked; show(null) clears.
+// way the turn's account walks all day: every room on it with a sign for
+// each slot the way takes its speaker there, the rooms passed between two
+// named ones included (the user, 11 November 2026), and the doors walked;
+// show(null) clears.
 export function drawMap(map, legend, big = innerWidth < 700, trim = false) {
   if (legend) legend.replaceChildren(slotLegend("#cfa75e"));
   map.classList.toggle("big", big);
@@ -87,7 +88,7 @@ export function drawMap(map, legend, big = innerWidth < 700, trim = false) {
     const signs = {}, walked = new Set();
     route(story, turn).forEach(({named, passed, doors}, slot) => {
       for (const room of named) (signs[room] ||= new Set()).add(slot);
-      for (const room of passed) signs[room] ||= new Set();
+      for (const room of passed) (signs[room] ||= new Set()).add(slot);
       for (const [a, b] of doors) walked.add(door(a, b));
     });
     for (const n of map.querySelectorAll("[data-door]"))

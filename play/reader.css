@@ -54,6 +54,10 @@ svg.map { width: 100%; height: auto; display: block; }
 .map.big text.name { font-size: 23px; }
 .map.big text.dead { font-size: 19px; }
 .map .body rect { fill: #3a0d09; stroke: var(--red); stroke-width: 4; }
+/* A coloured room on an account's way keeps its colour and takes the way's
+   gold wall, so the way reads unbroken through it. */
+.map .lit:is(.graveyard, .feature) rect { fill: #33274a; stroke: var(--gold); }
+.map .lit.body rect { fill: #5a130c; stroke: var(--gold); }
 /* A violet room's name turns bone where gold or red covers the room. */
 .map :is(.lit, .body) text.name { fill: var(--bone); }
 .map text.dead { fill: var(--red); font: italic 600 13px "Libre Caslon Text", serif; text-anchor: middle; dominant-baseline: middle; }

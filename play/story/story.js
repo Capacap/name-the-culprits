@@ -140,7 +140,16 @@ const r = reader({
     aimed.push(entry);
     if (turn.kind !== "account") return;
     entry.prepend(el("div", {class: "who"}, names[turn.speaker]));
-    if (answer) { entry.classList.add("answer"); return; }
+    // An account that answers a charge has no panel of its own; its map
+    // stands over its words, under the charge.
+    if (answer) {
+      entry.classList.add("answer");
+      const map = accountMap(turn, beat.day);
+      map.classList.add("answer");
+      entry.before(map);
+      aimed.push(map);
+      return;
+    }
     last = row({turn, day: beat.day, entry});
     aimed.push(last.block);
     shown(last.block);

@@ -42,7 +42,8 @@
 .solo .fig.b { left: 64%; translate: -50% 0; }
 .solo > .body { width: var(--col); margin: 0 auto; padding: 0; }
 /* The account's map, centred under the art at one width on every screen. */
-.solo > .map { width: min(440px, 100% - 1.6rem); margin: -0.2em auto 1em; transition: filter 0.6s; }
+.solo > .map, #log > .map.answer { width: min(440px, 100% - 1.6rem); margin: -0.2em auto 1em; transition: filter 0.6s; }
+#log > .map.answer { margin-top: 0.8em; }
 .pair.past > .map { filter: brightness(0.6) saturate(0.7); }
 .pair .entry { margin-bottom: 0.6em; }
 

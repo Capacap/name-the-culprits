@@ -106,13 +106,9 @@ export function mount(ctx) {
   ends.append(notesBtn);
   const teacher = rulesInPlay(ctx);
   const rulesCard = () => el("div", {}, el("h3", {}, "The rules"), ...teacher.card());
-  const rulesBtn = tool("rules", "Rules", rulesCard);
-  // A notice on the button while the rules are new, until the Rules card
-  // opens (button or R) or the second day begins.
-  const note = el("span", {class: "notice"}, "All my rules are here");
-  rulesBtn.append(note);
-  ctx.on("card", key => { if (key === "rules") note.remove(); });
-  ctx.on("day", (_p, day) => { if (day >= 2) note.remove(); });
+  tool("rules", "Rules", rulesCard);
+  // The button under a caption of a rule opens the card (rules-play.js).
+  ctx.on("rules", () => { if (open !== "rules") show("rules", rulesCard); });
   // The house is the plain map, moved into the card while it is open; it
   // lights no route, since every account carries its own map (story.js).
   // A guest's name in the log, or their head in the table of marks, opens

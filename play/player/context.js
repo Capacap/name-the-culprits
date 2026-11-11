@@ -2,7 +2,8 @@
 // talk through, and what happens to each entry as it is told.
 //   on(name, f) / emit(name, ...): the events "entry" (an entry told,
 //     with the turn it tells), "step" (after each step), "day" (a day's
-//     title), "end" (the challenge's entry), and the workspace's "card".
+//     title), "end" (the challenge's entry), the workspace's "card" and
+//     "rules" (a caption's button asks for the Rules card).
 //   begin(b): a new beat; add(beat, entry, turn): a turn continuing the
 //     beat's speaker, true for an account that answers a charge. Both set
 //     the entry's speaker as data-speaker and its slot signs (none on the dawn's question and its answers, the

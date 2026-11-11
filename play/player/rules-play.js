@@ -1,6 +1,7 @@
 // The rules told in play: Veronique's own lines carry underlined words, and
 // pressing one brings a new caption of hers saying more, which may carry an
-// underlined word of its own, at most three captions deep. No question is
+// underlined word of its own, at most three captions deep. Each such caption
+// ends in a button that opens the Rules card. No question is
 // put in the player's mouth and no line is in small type. The user's pick
 // of 1 November 2026 ("condensed") from rounds of trial ways.
 //
@@ -111,6 +112,13 @@ export function rulesInPlay(ctx) {
 
   const caption = (...body) => el("div", {class: "entry narrator answer current"},
     el("div", {class: "who"}, "Veronique"), el("div", {class: "text"}, ...body));
+  // The button under a caption of a rule, which opens the Rules card (the
+  // workspace answers "rules").
+  function toRules() {
+    const b = el("button", {class: "torules"}, "All the rules");
+    b.onclick = e => { e.stopPropagation(); ctx.emit("rules"); };
+    return b;
+  }
   const uncurrent = () => { for (const c of log.querySelectorAll(".entry.current")) c.classList.remove("current"); };
   // A new caption in the strip: at its end the strip settles, else it
   // scrolls into view.
@@ -129,7 +137,7 @@ export function rulesInPlay(ctx) {
       if (b.classList.contains("spent")) return;
       b.classList.add("spent");
       const next = el("span", {class: "line"}, levels[k + 1][0]);
-      const r = el("div", {class: "reply follow"}, caption(next));
+      const r = el("div", {class: "reply follow"}, caption(next, toRules()));
       uncurrent();
       reply.after(r);
       chain(levels, k + 1, r, next);
@@ -143,6 +151,7 @@ export function rulesInPlay(ctx) {
     const her = caption(line);
     const drawn = pictureOf(item, 1.5);
     if (drawn) her.append(el("div", {class: "drawn"}, drawn));
+    her.append(toRules());
     const reply = el("div", {class: "reply"}, her);
     chain(levels, 0, reply, line);
     return reply;

@@ -145,15 +145,17 @@ function checkStory(where, s, entry) {
     if (!Number.isInteger(day.ends) || day.ends < 0 || day.ends >= nslots) fault(w, "ends must be a slot index");
     const dslots = Number.isInteger(day.ends) ? day.ends + 1 : nslots;
     // The first alarm, as her dawn tells it, sets `ends`; every account
-    // but its raiser's ends on a line of the alarm in that slot.
+    // ends on a line of an alarm in that slot, but that of a guest who
+    // raised one then, since two may be raised from two rooms at once.
     const told = (day.turns || []).filter((t) => t.speaker === "narrator").flatMap((t) => (t.lines || []).map((l) => l.text)).join(" ");
     const alarm = told.match(/At (\w+) (.+?) raised the alarm from/);
     const first = alarm ? (s.slots || []).findIndex((x) => x.toLowerCase() === alarm[1].toLowerCase()) : nslots - 1;
     if (day.ends !== first) fault(w, `ends is ${day.ends}, the day's first alarm ${alarm ? "is at " + alarm[1] : "is none"}`);
     if (alarm) {
-      const raiser = (s.cast || []).find((c) => c.name === alarm[2])?.id;
+      const raisers = [...told.matchAll(/At (\w+) (.+?) raised the alarm from/g)].filter((m) => m[1] === alarm[1])
+        .map((m) => (s.cast || []).find((c) => c.name === m[2])?.id);
       for (const t of day.turns || []) {
-        if (t.kind !== "account" || t.speaker === raiser) continue;
+        if (t.kind !== "account" || raisers.includes(t.speaker)) continue;
         const last = (t.lines || []).at(-1);
         if (!last?.slots || last.slots[0] !== day.ends || last.slots[1] !== day.ends || !/raised? the alarm/.test(last.text)) fault(w, `${t.speaker}'s account does not end on the alarm`);
       }

@@ -21,12 +21,12 @@ A story's id is a string of lowercase letters and digits, unique in the library.
   "format": 4,
   "stories": [
     {"id": "7396ae98e6", "story": "7396ae98e6.json", "answer": "7396ae98e6.answer.json",
-     "days": 3, "cast": 8, "date": null, "difficulty": null}
+     "days": 3, "cast": 8, "date": null, "difficulty": "medium"}
   ]
 }
 ```
 
-`days` is the number of days the story tells and `cast` the number of guests. `date` (a `YYYY-MM-DD` string) and `difficulty` (a string) are null until the game has a story a day; several difficulties on one date are several entries.
+`days` is the number of days the story tells and `cast` the number of guests. `difficulty` is `"easy"`, `"medium"` or `"hard"`, or null for a story not yet rated; the library screen shows it and filters by it, and by length, where a story of one or two days is short. `date` (a `YYYY-MM-DD` string) is null until the game has stories by the day; several stories on one date are several entries.
 
 ## The story
 

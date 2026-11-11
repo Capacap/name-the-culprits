@@ -278,7 +278,8 @@ function main(folder) {
     ids.add(e.id);
     if (!Number.isInteger(e.days) || !Number.isInteger(e.cast)) fault(where, "days and cast are numbers");
     if ("score" in e) fault(where, "score is format 1's");
-    if (!("date" in e) || !("difficulty" in e)) fault(where, "date and difficulty must be present, null for now");
+    if (!("date" in e) || !("difficulty" in e)) fault(where, "date and difficulty must be present");
+    if (e.difficulty !== null && !["easy", "medium", "hard"].includes(e.difficulty)) fault(where, "difficulty is easy, medium, hard or null");
     for (const f of [e.story, e.answer]) {
       if (!isStr(f) || !existsSync(join(folder, f))) fault(where, `missing file ${f}`);
     }

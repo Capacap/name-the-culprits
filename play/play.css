@@ -9,11 +9,22 @@ h1 { margin: 0; font: 700 clamp(2.4em, 8vw, 3.6em) "Cinzel", serif; letter-spaci
 .left { min-height: 1.5em; margin: 0.6em 0 0; color: var(--dim); font-size: 0.85em; }
 .alpha { margin: 0.2em 0 1.8em; color: var(--dim); font-size: 0.75em; }
 .stories { display: grid; grid-template-columns: repeat(auto-fill, minmax(88px, 1fr)); gap: 0.5em; margin: 0; padding: 0; list-style: none; }
-.stories a { display: flex; flex-direction: column; align-items: center; min-height: 5.2em; padding: 0.55em 0.2em 0.45em; text-decoration: none; color: inherit; background: #15100c; border: 1px solid #3a2f22; }
+.stories a { display: flex; flex-direction: column; align-items: center; min-height: 6.4em; padding: 0.55em 0.2em 0.45em; text-decoration: none; color: inherit; background: #15100c; border: 1px solid #3a2f22; }
 .stories a:hover { border-color: var(--gold); }
 .stories b { font: 700 1.25em "Cinzel", serif; color: var(--gold); }
 .stories span { font-size: 0.75em; color: var(--dim); text-align: center; }
 .stories em { margin-top: 0.15em; font: normal 0.7em "Cinzel", serif; letter-spacing: 0.08em; color: var(--dim); }
+.stories i { margin-top: 0.2em; font: normal 0.7em "Cinzel", serif; letter-spacing: 0.1em; text-transform: uppercase; }
+.stories i.easy { color: #9cc27a; }
+.stories i.medium { color: var(--gold); }
+.stories i.hard { color: var(--red); }
+.stories li[hidden] { display: none; }
+.filters { display: grid; gap: 0.4em; margin: 0 0 1.2em; }
+.filters div { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.4em; }
+.filters button { padding: 0.35em 0.9em; cursor: pointer; background: none; color: var(--dim); border: 1px solid #3a2f22; font: 500 0.75em "Cinzel", serif; letter-spacing: 0.1em; text-transform: uppercase; }
+.filters button:hover { border-color: var(--gold); }
+.filters button[aria-pressed="true"] { color: #140d09; background: var(--gold); border-color: var(--gold); }
+.random:disabled { opacity: 0.4; cursor: default; }
 .stories a.played { opacity: 0.6; }
 .stories a.solved { opacity: 0.6; border-color: #4f6b3a; }
 .stories a.solved em { color: #9cc27a; }

@@ -2,15 +2,17 @@
 //   Veronique tells the rules in play (rules-play.js): her opening, her
 //     house and her own lines carry underlined words, each bringing a
 //     caption of hers that says more; the Rules card is rules-play's.
-//   The dock holds the cast's heads, each opening a dossier, and the
-//     workspace's tools: Rules and House (the plain map) open in the one card, and Notes (the
-//     player's page) in a pane of its own beside it; N, R and H open the
-//     three, Esc closes the card, then the notes. The dock's height is the
-//     root's --dock.
-//   A line of an account is marked from its speaker's mark for that day: a
-//     suspect's or a culprit's lines doubted, a cleared guest's trusted.
-//     The marks are set beside each account (story.js), and stand as a
-//     table over her challenge.
+//   The dock holds the workspace's tools: Rules and House (the plain map)
+//     open in the one card, and Notes (the player's page) in a pane of its
+//     own beside it; N, R and H open the three, Esc closes the card, then
+//     the notes. The dock's height is the root's --dock.
+//   A guest's name in the log, said in a line or standing over an account,
+//     opens their dossier in the card, and so does their head in the table
+//     of marks.
+//   A line of an account takes the colour of its speaker's mark for that
+//     day, or of their culprit mark where the day has none. The marks are
+//     set beside each account (story.js), and stand as a table over her
+//     challenge.
 //   Before the challenge she closes the rules, and the accusation follows
 //     it in the log, the cast in two rows; continue moves up to follow the
 //     last turn, and its press brings the challenge into view.
@@ -54,25 +56,25 @@ export function mount(ctx) {
   addEventListener("keydown", e => {
     if ([" ", "Enter", "ArrowRight"].includes(e.key) && !e.target.closest?.("textarea, input, select")) take(e);
   }, true);
-  // Marks on the lines of accounts, from the speaker's mark for the
-  // account's day, or their culprit mark (data-auto).
-  const AUTO = {suspect: "doubt", cleared: "trust"};
+  // The lines of an account carry the speaker's mark for the account's
+  // day, or "culprit" where they are marked so and the day has no mark
+  // (data-auto).
   function lines(entry) {
     if (!entry.classList.contains("account")) return;
     entry.querySelectorAll(".line").forEach(line => {
-      const draw = () => { const who = entry.dataset.speaker; line.dataset.auto = t.culprit(who) ? "doubt" : AUTO[t.markOf(+entry.dataset.day, who)] || ""; };
+      const draw = () => { const who = entry.dataset.speaker; line.dataset.auto = t.markOf(+entry.dataset.day, who) || (t.culprit(who) ? "culprit" : ""); };
       t.watchers.push(draw);
       draw();
     });
   }
   ctx.on("entry", lines);
 
-  // The dock: heads open dossiers; Notes, Rules and House are the tools.
+  // The dock: Notes, Rules and House are the tools.
   // On a narrow screen the card is a modal over a scrim that closes it.
   const dock = el("nav", {class: "dock"}), card = el("aside", {class: "dossier"}), scrim = el("div", {class: "scrim"});
   scrim.onclick = () => show(open);
-  const heads = el("div", {class: "heads"}), ends = el("div", {class: "ends"});
-  dock.append(heads, ends);
+  const ends = el("div", {class: "ends"});
+  dock.append(ends);
   let open = null;
   const pop = document.getElementById("pop"), home = pop.parentElement;
   function show(key, build) {
@@ -93,11 +95,6 @@ export function mount(ctx) {
     if (k === "n") { e.preventDefault(); toggleNotes(); }
     if (k === "r") show("rules", rulesCard);
   });
-  for (const id of t.guests) {
-    const b = el("button", {class: "g", "data-key": id, "data-id": id}, t.head(id), el("span", {}, names[id]));
-    b.onclick = () => show(id, () => dossier(id));
-    heads.append(b);
-  }
   const tool = (key, label, build) => {
     const b = el("button", {class: "end", "data-key": key}, label);
     b.onclick = () => show(key, build);
@@ -118,13 +115,14 @@ export function mount(ctx) {
   ctx.on("day", (_p, day) => { if (day >= 2) note.remove(); });
   // The house is the plain map, moved into the card while it is open; it
   // lights no route, since every account carries its own map (story.js).
-  // A guest's name in the log opens their dossier, by tap or click alike.
+  // A guest's name in the log, or their head in the table of marks, opens
+  // their dossier, by tap or click alike.
   const houseCard = () => el("div", {class: "housecard"}, el("h3", {}, "The house"), pop);
   const houseBtn = tool("house", "House", houseCard);
   houseOnDemand(houseBtn, () => show("house", houseCard));
   log.addEventListener("click", e => {
-    const id = e.target.closest(".guest-name")?.dataset.id;
-    if (id && open !== id) show(id, () => dossier(id));
+    const id = e.target.closest(".guest-name, .speaker, .marktable .mh")?.dataset.id;
+    if (t.guests.includes(id) && open !== id) show(id, () => dossier(id));
   });
   // Back to the library, to pick another story.
   const back = el("button", {class: "end"}, "Library");
@@ -135,20 +133,13 @@ export function mount(ctx) {
   ctx.foot = () => dock.offsetHeight + (noting && !SIDE.matches ? pane.offsetHeight : 0);
   new ResizeObserver(() => document.documentElement.style.setProperty("--dock", `${dock.offsetHeight}px`)).observe(dock);
 
-  const draw = () => heads.querySelectorAll(".g").forEach(g => {
-    g.classList.toggle("dead", !!t.examined(g.dataset.id));
-    g.dataset.mark = t.culprit(g.dataset.id) ? "culprit" : "";
-  });
-  t.watchers.push(draw);
   // An open dossier is rebuilt after each step, where it was scrolled to.
   ctx.on("step", () => {
-    draw();
     if (!open || !t.guests.includes(open)) return;
     const at = card.scrollTop;
     card.replaceChildren(card.firstChild, dossier(open));
     card.scrollTop = at;
   });
-  draw();
 
   // A guest's dossier: their head, name, pronouns and state on one line,
   // then what they have said.

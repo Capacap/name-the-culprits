@@ -62,4 +62,4 @@ A player is never identified. When a story is opened the game makes a random id 
 
 ## The game view
 
-`play/story/` is the game: the story as one strip read downward, every account a wide panel of its speaker, then the house lit with the way the account walks that day, then the words, and the player's workspace over it (`play/player/`): a dock of the guests' heads and the Rules, House, Notes and Library buttons. Veronique tells the rules in play (`play/player/rules-play.js`). It loads the shared reader and helpers in `play/` and the art in `art/drawn/`. `?story=<id>` picks the story.
+`play/story/` is the game: the story as one strip read downward, every account a wide panel of its speaker, then the house lit with the way the account walks that day, then the words, and the player's workspace over it (`play/player/`): the marks beside each account, a guest's card opened from their name, and a dock of the Rules, House, Notes and Library buttons. Veronique tells the rules in play (`play/player/rules-play.js`). It loads the shared reader and helpers in `play/` and the art in `art/drawn/`. `?story=<id>` picks the story.

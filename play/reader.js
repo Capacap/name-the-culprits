@@ -166,7 +166,7 @@ export function reader(view) {
     for (const e of view.log.querySelectorAll(".entry.current")) e.classList.remove("current");
     const e = el("div", {class: `entry current ${speaker === "narrator" ? "narrator" : ""} ${kind}`});
     e.dataset.day = day;
-    if (!turn?.continues) e.append(el("div", {class: "who"}, names[speaker]));
+    if (!turn?.continues) e.append(el("div", {class: "who"}, el("span", {class: "speaker", "data-id": speaker}, names[speaker])));
     const text = el("div", {class: "text"});
     for (const line of lines) {
       const span = el("span", {class: "line"});

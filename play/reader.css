@@ -22,7 +22,6 @@ body { font: 18px/1.55 "Libre Caslon Text", serif; }
 .entry.current { color: var(--bone); }
 .entry .who { font: 700 13px "Cinzel", serif; letter-spacing: 0.16em; color: var(--gold); }
 .entry .line { display: block; padding: 0.05em 0.4em; margin-left: -0.4em; border-left: 2px solid transparent; }
-.entry .line[data-slots]:hover { border-left-color: var(--gold); background: rgba(207, 167, 94, 0.1); }
 .entry.narrator { font: italic 500 20px/1.45 var(--her), serif; color: #a8574b; }
 .entry.narrator.current { color: var(--red); }
 .entry.narrator .who { color: var(--blood); }

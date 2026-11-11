@@ -67,13 +67,14 @@ export function tools(ctx) {
     return box;
   }
   // The player's marks to read before the accusation: a column for each
-  // guest under their head, a row for each day. It shows nothing while no
-  // mark is set.
+  // guest under their head, a row for each day, an examined guest's head
+  // greyed. It shows nothing while no mark is set. A head opens the
+  // guest's card (workspace.js).
   function markTable() {
     const days = story.days.length;
     const grid = el("div", {class: "grid"});
     grid.style.gridTemplateColumns = `auto repeat(${guests.length}, 1fr)`;
-    grid.append(el("span", {}), ...guests.map(id => el("span", {class: "mh", "data-id": id}, head(id), el("span", {}, names[id]))));
+    grid.append(el("span", {}), ...guests.map(id => el("button", {class: "mh", "data-id": id}, head(id), el("span", {}, names[id]))));
     const cells = [];
     for (let d = 1; d <= days; d++) {
       grid.append(el("b", {class: "md"}, `Day ${d}`));
@@ -82,7 +83,7 @@ export function tools(ctx) {
     const box = el("section", {class: "marktable"}, el("p", {}, "Your marks, day by day."), grid);
     const draw = () => {
       for (const [c, d, id] of cells) { const m = markOf(d, id); c.dataset.mark = m; c.dataset.short = m ? m[0].toUpperCase() : ""; c.textContent = m || "\u2013"; }
-      for (const h of grid.querySelectorAll(".mh")) h.classList.toggle("culprit", culprit(h.dataset.id));
+      for (const h of grid.querySelectorAll(".mh")) { h.classList.toggle("culprit", culprit(h.dataset.id)); h.classList.toggle("dead", !!examined(h.dataset.id)); }
       box.hidden = !notes.culprit.length && !cells.some(([c]) => c.dataset.mark);
     };
     watchers.push(draw);

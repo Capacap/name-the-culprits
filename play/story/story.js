@@ -145,7 +145,7 @@ const r = reader({
     if (last) { last.col.append(entry); aimed.push(last.block || entry); return; }
     aimed.push(entry);
     if (turn.kind !== "account") return;
-    entry.prepend(el("div", {class: "who"}, names[turn.speaker]));
+    entry.prepend(el("div", {class: "who"}, el("span", {class: "speaker", "data-id": turn.speaker}, names[turn.speaker])));
     // An account that answers a charge has no panel of its own; its map
     // stands over its words, under the charge.
     if (answer) {

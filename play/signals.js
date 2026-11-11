@@ -20,7 +20,7 @@ import {kept} from "./player/save.js";
 
 const key = id => `berndle:play:${id}`;
 const KEY = key(STORY);
-const API = "../../api/";
+const API = "../api/";
 
 let rec = null, dropped = false;   // dropped: forgotten this visit, so the pagehide does not write it back
 function play() {

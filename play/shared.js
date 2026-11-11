@@ -2,8 +2,8 @@
 // a time, names marked in a line, the way an account walks, keys and slot
 // signs. ?story=<id> picks the story.
 
-export const STORY = new URLSearchParams(location.search).get("story") || "019f9745a0";
-export const ART = "../../art/drawn";
+export const STORY = new URLSearchParams(location.search).get("story");
+export const ART = "../art/drawn";
 export const NARRATOR = "Veronique";
 
 export const el = (tag, attrs = {}, ...children) => {
@@ -20,7 +20,7 @@ export const svg = (tag, attrs = {}) => {
 
 // The story, its names by id, and the steps: a day's title, then each turn.
 export async function load() {
-  const story = await (await fetch(`../../stories/${STORY}.json`)).json();
+  const story = await (await fetch(`../stories/${STORY}.json`)).json();
   const names = {narrator: NARRATOR};
   for (const c of story.cast) names[c.id] = c.name;
   for (const r of story.house.rooms) names[r.id] = r.name;

@@ -1,5 +1,5 @@
-"""Build the site's assets into dist/: the library (play/) and the game
-(play/story), with only the files those pages load, comments stripped and
+"""Build the site's assets into dist/: the one page (play/), which is the
+library or the game, with only the files it loads, comments stripped and
 the portraits as WebP.
 
     uv run --with pillow python deploy/build.py [--jobs N] [--site URL]
@@ -32,7 +32,7 @@ from PIL import Image
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DIST = os.path.join(ROOT, "dist")
-PAGES = ["play/index.html", "play/story/index.html"]
+PAGES = ["play/index.html"]
 ART = "art/drawn"
 # The art the game loads, for the guests the library's stories name (see
 # art_ship): each guest's portrait, their mood pictures (cast.js MOODS) and
@@ -54,7 +54,7 @@ def refs(path, text):
     if path.endswith(".html"):
         found = re.findall(r'(?:href|src)="([^"]+)"', text)
     elif path.endswith(".js"):
-        found = re.findall(r'(?:from|import)\s*"([^"]+)"', text)
+        found = re.findall(r'(?:from|import)\s*\(?"([^"]+)"', text)
     else:
         found = re.findall(r'url\(["\']?([^"\')]+)', text)
     base = os.path.dirname(path)
@@ -169,7 +169,7 @@ def main():
     kept = kept_stories(args.site) if args.site else {}
     files = walk()
     if "play/story/story.js" not in files:
-        sys.exit("the game's module was not reached from its page")
+        sys.exit("the game's module was not reached from the page")
     # A library check.mjs faults (an older format, a broken verdict) never ships.
     if subprocess.run(["node", "check.mjs", "stories"], cwd=ROOT).returncode:
         sys.exit("check.mjs faults the library; nothing was built")

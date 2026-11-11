@@ -6,11 +6,23 @@
 <title>The Loose Threads</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Text:ital,wght@0,400;0,700;1,400&family=Cinzel:wght@500;700&display=swap">
-<link rel="stylesheet" href="play.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Text:ital,wght@0,400;0,700;1,400&family=Cinzel:wght@500;700&family=Playfair+Display:ital,wght@1,500&family=Grenze+Gotisch:wght@700;900&display=swap">
+<!-- One page, two views: the library, or with ?story=<id> the game. Each
+     view's stylesheets and markup carry its name as their class, and the
+     two scripts below drop the other view's before anything is drawn. -->
+<link rel="stylesheet" href="play.css" class="library">
+<link rel="stylesheet" href="reader.css" class="game">
+<link rel="stylesheet" href="story/story.css" class="game">
+<link rel="stylesheet" href="player/player.css" class="game">
+<link rel="stylesheet" href="story/tools.css" class="game">
+<script>
+const OTHER = new URLSearchParams(location.search).get("story") ? ".library" : ".game";
+const drop = () => { for (const n of document.querySelectorAll(OTHER)) n.remove(); };
+drop();
+</script>
 </head>
 <body>
-<main>
+<main class="library">
   <h1>The Loose Threads</h1>
   <p class="lede">A murder mystery in a house of guests. Hear them out, then name the culprits.</p>
   <button id="next" class="random"></button>
@@ -23,6 +35,9 @@
   <div class="more"><button id="random">Random story</button></div>
   <ol id="stories" class="stories"></ol>
 </main>
-<script type="module" src="play.js"></script>
+<div id="log" class="log game"><button id="next" class="next quiet">continue</button><div id="spacer"></div></div>
+<div id="pop" class="game"><div id="legend" class="legend-row"></div><svg id="map" class="map"></svg></div>
+<script>drop();</script>
+<script type="module" src="boot.js"></script>
 </body>
 </html>

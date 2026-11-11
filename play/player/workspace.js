@@ -122,7 +122,7 @@ export function mount(ctx) {
   });
   // Back to the library, to pick another story.
   const back = el("button", {class: "end"}, "Library");
-  back.onclick = () => { location.href = "../"; };
+  back.onclick = () => { location.href = "./"; };
   ends.append(back);
   document.body.append(card);
   document.body.append(scrim, dock);

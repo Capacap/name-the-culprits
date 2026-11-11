@@ -7,7 +7,7 @@
 // button that opens one of the shown stories at random.
 import {progress} from "./progress.js";
 
-const GAME = "story/?story=";
+const GAME = "?story=";
 const plural = (n, word) => `${n} ${word}${n === 1 ? "" : "s"}`;
 const label = r => r.state === "solved" ? (r.guesses.length === 1 ? "Solved first time" : r.guesses.length ? `Solved in ${r.guesses.length}` : "Solved")
   : r.state === "revealed" ? "Truth opened" : r.guesses.length ? plural(r.guesses.length, "accusation") : "Played";

@@ -27,7 +27,7 @@ The checker needs Node 18 or later and nothing else. It prints one line per faul
 
 ## Playing and publishing
 
-`play/` is the library: every story in `stories/`, numbered, with a button that opens one this browser has not played yet. Each story opens in the game view, `play/story/?story=<id>`, whose Library button and the link under a sealed accusation lead back. The browser keeps, per story, how far it was read (`play/player/save.js`, played back on a reload) and every team sealed (`play/progress.js`); the library shows which stories were solved and in how many accusations, and which had the truth opened. With `stories/` and `art/drawn/` in place, serve the repository's top folder and open `/play/`.
+`play/` is the library: every story in `stories/`, numbered, with a button that opens one this browser has not played yet. Each story opens in the game view, the same page with the story named, `play/?story=<id>` (`play/boot.js` picks the view), whose Library button and the link under a sealed accusation lead back. The browser keeps, per story, how far it was read (`play/player/save.js`, played back on a reload) and every team sealed (`play/progress.js`); the library shows which stories were solved and in how many accusations, and which had the truth opened. With `stories/` and `art/drawn/` in place, serve the repository's top folder and open `/play/`.
 
 ## The site
 
@@ -62,4 +62,4 @@ A player is never identified. When a story is opened the game makes a random id 
 
 ## The game view
 
-`play/story/` is the game: the story as one strip read downward, every account a wide panel of its speaker, then the house lit with the way the account walks that day, then the words, and the player's workspace over it (`play/player/`): the marks beside each account, a guest's card opened from their name, and a dock of the Rules, House, Notes and Library buttons. Veronique tells the rules in play (`play/player/rules-play.js`). It loads the shared reader and helpers in `play/` and the art in `art/drawn/`. `?story=<id>` picks the story.
+`play/story/` holds the game: the story as one strip read downward, every account a wide panel of its speaker, then the house lit with the way the account walks that day, then the words, and the player's workspace over it (`play/player/`): the marks beside each account, a guest's card opened from their name, and a dock of the Rules, House, Notes and Library buttons. Veronique tells the rules in play (`play/player/rules-play.js`). It loads the shared reader and helpers in `play/` and the art in `art/drawn/`. `?story=<id>` picks the story.

@@ -176,7 +176,7 @@ export function tools(ctx) {
       const again = el("a", {href: "#"}, "Read it again from the start");
       // The reading and the play go together; the next load is a new play.
       again.onclick = e => { e.preventDefault(); forget(story.id); forgetPlay(story.id); location.reload(); };
-      const onward = el("p", {class: "onward"}, el("a", {href: "../"}, "Play another story"), " \u00b7 ", again);
+      const onward = el("p", {class: "onward"}, el("a", {href: "./"}, "Play another story"), " \u00b7 ", again);
       if (closed) return after.replaceChildren(onward);
       if (!rec.guesses.length) return after.replaceChildren();
       const open = el("button", {class: "opentruth"}, "Open the truth");
@@ -278,7 +278,7 @@ export function tools(ctx) {
 
   // A failed fetch is forgotten, so the next call tries again.
   let answered = null;
-  const answer = () => answered ||= fetch(`../../stories/${STORY}.answer.json`)
+  const answer = () => answered ||= fetch(`../stories/${STORY}.answer.json`)
     .then(r => { if (!r.ok) throw new Error(`answer ${r.status}`); return r.json(); })
     .catch(e => { answered = null; throw e; });
 

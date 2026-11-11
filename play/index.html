@@ -12,12 +12,18 @@
 <body>
 <main>
   <h1>The Loose Threads</h1>
-  <p class="lede">A murder mystery in a house of guests. Read their accounts of a few days, then name the culprits. A long story takes about 15 minutes, a short one less.</p>
-  <button id="random" class="random">Random story</button>
-  <p id="left" class="left"></p>
+  <p class="lede">A murder mystery in a house of guests. Hear them out, then name the culprits.</p>
+  <button id="next" class="random"></button>
+  <p id="nextline" class="left"></p>
+  <div class="more">
+    <button id="random-short">Random short</button>
+    <button id="random-long">Random long</button>
+  </div>
   <p id="tally" class="left"></p>
   <p class="alpha">Alpha. Your progress is kept in this browser only.</p>
-  <div id="filters" class="filters"></div>
+  <h2>All stories</h2>
+  <div id="tabs" class="filters"></div>
+  <p id="left" class="left"></p>
   <ol id="stories" class="stories"></ol>
 </main>
 <script type="module" src="play.js"></script>

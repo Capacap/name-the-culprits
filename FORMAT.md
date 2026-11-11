@@ -26,7 +26,7 @@ A story's id is a string of lowercase letters and digits, unique in the library.
 }
 ```
 
-`days` is the number of days the story tells and `cast` the number of guests. `difficulty` is `"easy"`, `"medium"` or `"hard"`, or null for a story not yet rated; the library screen shows it and filters by it, and by length, where a story of one or two days is short. `date` (a `YYYY-MM-DD` string) is null until the game has stories by the day; several stories on one date are several entries.
+`days` is the number of days the story tells and `cast` the number of guests. `difficulty` is `"easy"`, `"medium"` or `"hard"`, or null for a story not yet rated; the library screen does not show it. The screen calls a story of one or two days short and a longer one long. `date` (a `YYYY-MM-DD` string) is null until the game has stories by the day; several stories on one date are several entries.
 
 ## The story
 

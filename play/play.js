@@ -1,9 +1,10 @@
-// The library: every story in stories/index.json, numbered in its order
-// and labelled with its days, guests and difficulty, each marked from this
-// browser's progress (played, solved and in how many accusations, or the
-// truth opened), a count of the finished stories and the accusations made,
-// two rows of filters (length and difficulty, kept across visits) and a
-// button that opens one of the shown stories not yet played at random.
+// The library: a button that offers the next case by days from this
+// browser's progress (a one-day case until one is solved, then two days,
+// then three and more), a random short and a random long story, and under
+// them every story in stories/index.json, numbered in its order, labelled
+// short or long with its days and marked from the progress (played, solved
+// and in how many accusations, or the truth opened), behind tabs for all,
+// short and long that are kept across visits.
 import {progress} from "./progress.js";
 
 const GAME = "story/?story=";
@@ -19,23 +20,48 @@ const done = progress();
 
 // A short story tells one or two days.
 const length = s => s.days <= 2 ? "short" : "long";
-const FILTERS = [
-  {key: "length", of: length, options: ["short", "long"]},
-  {key: "difficulty", of: s => s.difficulty, options: ["easy", "medium", "hard"]},
-];
-const KEPT = "loose-threads-library-filters";
-let chosen = {};
-try { chosen = JSON.parse(localStorage.getItem(KEPT)) || {}; } catch { /* a first visit, or storage refused */ }
-for (const f of FILTERS) if (!f.options.includes(chosen[f.key])) delete chosen[f.key];
-const shown = s => FILTERS.every(f => !chosen[f.key] || f.of(s) === chosen[f.key]);
+const TABS = ["short", "long"];
+const KEPT = "loose-threads-library-tab";
+let tab = null;
+try { tab = localStorage.getItem(KEPT); } catch { /* storage refused */ }
+if (!TABS.includes(tab)) tab = null;
+
+const open = pool => { location.href = GAME + pool[Math.floor(Math.random() * pool.length)].id; };
+// A story of the kind not yet played, or any of the kind once all are.
+const draw = kind => {
+  const all = stories.filter(kind), fresh = all.filter(s => !done[s.id]);
+  return fresh.length ? fresh : all;
+};
+
+// The next case: the fewest days the player has not yet solved a story of,
+// among one day, two days and three or more.
+const STEPS = [
+  {kind: s => s.days === 1, first: "Play your first case", again: "Another one-day case", line: "A single day in the house."},
+  {kind: s => s.days === 2, first: "Ready for two days?", again: "Another two-day case", line: "The culprits get a second night."},
+  {kind: s => s.days >= 3, first: "A full mystery: three days", again: "Another full mystery", line: "Three days or more in the house."},
+].filter(step => stories.some(step.kind));
+const solved_ = step => stories.some(s => step.kind(s) && done[s.id]?.state === "solved");
+const played_ = step => stories.some(s => step.kind(s) && done[s.id]);
+const step = STEPS.find(st => !solved_(st)) || STEPS[STEPS.length - 1];
+const next = document.getElementById("next");
+if (step) {
+  next.textContent = played_(step) ? step.again : step.first;
+  document.getElementById("nextline").textContent = step.line;
+  next.onclick = () => open(draw(step.kind));
+}
+for (const kind of TABS) {
+  const b = document.getElementById(`random-${kind}`);
+  const pool = draw(s => length(s) === kind);
+  b.hidden = !pool.length;
+  b.onclick = () => open(pool);
+}
 
 const list = document.getElementById("stories");
 const tiles = stories.map((s, i) => {
   const a = document.createElement("a");
   a.href = GAME + s.id;
   a.className = done[s.id]?.state || "";
-  a.innerHTML = `<b>${i + 1}</b><span>${plural(s.days, "day")}<br>${s.cast} guests</span>`;
-  if (s.difficulty) a.insertAdjacentHTML("beforeend", `<i class="${s.difficulty}">${s.difficulty}</i>`);
+  a.innerHTML = `<b>${i + 1}</b><span>${length(s) === "short" ? "Short" : "Long"}<br>${plural(s.days, "day")}</span>`;
   if (done[s.id]) a.insertAdjacentHTML("beforeend", `<em>${label(done[s.id])}</em>`);
   const li = document.createElement("li");
   li.append(a);
@@ -43,38 +69,26 @@ const tiles = stories.map((s, i) => {
   return li;
 });
 
-const button = document.getElementById("random");
 const left = document.getElementById("left");
-let pool = stories;
 function show() {
-  const here = stories.filter(shown);
+  const shown = s => !tab || length(s) === tab;
   stories.forEach((s, i) => { tiles[i].hidden = !shown(s); });
-  const fresh = here.filter(s => !done[s.id]);
-  const all = here.length === stories.length;
-  left.textContent = !here.length ? "No story fits both choices."
-    : !fresh.length ? (all ? "You have played every story." : "You have played every story shown.")
-    : all && fresh.length === stories.length ? ""
-    : `${fresh.length} of ${here.length} not yet played`;
-  pool = fresh.length ? fresh : here;
-  button.disabled = !pool.length;
+  const here = stories.filter(shown), fresh = here.filter(s => !done[s.id]);
+  left.textContent = fresh.length === here.length ? `${here.length} ${here.length === 1 ? "story" : "stories"}`
+    : fresh.length ? `${fresh.length} of ${here.length} not yet played` : "You have played every one of these.";
 }
-const bar = document.getElementById("filters");
-for (const f of FILTERS) {
-  const row = document.createElement("div");
-  for (const option of [null, ...f.options]) {
-    const b = document.createElement("button");
-    b.textContent = option || "all";
-    if (!option) b.setAttribute("aria-label", `any ${f.key}`);
-    b.setAttribute("aria-pressed", String((chosen[f.key] || null) === option));
-    b.onclick = () => {
-      if (option) chosen[f.key] = option; else delete chosen[f.key];
-      try { localStorage.setItem(KEPT, JSON.stringify(chosen)); } catch { /* the choice lasts this visit */ }
-      for (const other of row.children) other.setAttribute("aria-pressed", String(other === b));
-      show();
-    };
-    row.append(b);
-  }
-  bar.append(row);
+const bar = document.getElementById("tabs");
+for (const option of [null, ...TABS]) {
+  const b = document.createElement("button");
+  b.textContent = option || "all";
+  b.setAttribute("aria-pressed", String(tab === option));
+  b.onclick = () => {
+    tab = option;
+    try { option ? localStorage.setItem(KEPT, option) : localStorage.removeItem(KEPT); } catch { /* the choice lasts this visit */ }
+    for (const other of bar.children) other.setAttribute("aria-pressed", String(other === b));
+    show();
+  };
+  bar.append(b);
 }
 show();
 
@@ -86,4 +100,3 @@ document.getElementById("tally").textContent = !made && !solved.length && !opene
   `Solved ${solved.length} of ${stories.length}${first ? `, ${first} at the first accusation` : ""}.`,
   opened.length ? `The truth opened in ${opened.length} ${opened.length === 1 ? "story" : "stories"}.` : "",
   made ? `${plural(made, "accusation")} made.` : ""].filter(Boolean).join(" ");
-button.onclick = () => { location.href = GAME + pool[Math.floor(Math.random() * pool.length)].id; };

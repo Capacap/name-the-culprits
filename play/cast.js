@@ -38,7 +38,7 @@ const OWN_HEAD = [512, 360, 680, 100];
 export const zoom = who => `--zoom: ${(FACE_REF / (HEADS[who] || OWN_HEAD)[3]).toFixed(3)}`;
 // The style of a headshot cut from a picture framed like the portrait
 // (story.css .head), the square kept inside the picture as the icon
-// cutter keeps it, so the dock icon and the headshot show one crop.
+// cutter keeps it, so the icon and the headshot show one crop.
 export function head(who) {
   let [cx, cy, side] = HEADS[who] || OWN_HEAD;
   cx = Math.min(Math.max(cx, side / 2), 1024 - side / 2);

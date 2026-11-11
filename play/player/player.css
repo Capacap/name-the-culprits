@@ -35,8 +35,8 @@
 .marking .line[data-auto="culprit"] { border-left-color: var(--gold); }
 
 /* A guest's name in the log opens their card. */
-.log :is(.guest-name, .entry.account .speaker) { cursor: pointer; }
-.log .entry.account .speaker:hover { color: var(--bone); }
+.log :is(.guest-name, .entry:not(.narrator) .speaker) { cursor: pointer; }
+.log .entry:not(.narrator) .speaker:hover { color: var(--bone); }
 
 /* The game's tools. */
 .rules section { margin: 0 0 0.9em; }

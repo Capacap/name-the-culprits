@@ -73,10 +73,11 @@ img.head[src*="/icon/"] { object-position: 50% 50%; }
   .marktable .cell { font-size: 0; padding: 0; height: 20px; line-height: 18px; }
   .marktable .cell::before { content: attr(data-short); font-size: 11px; }
 }
-/* A guest the player marked culprit, on the accusation's tile and the dock. */
-.accuse .pick .who.culprit:not(.on) { border-color: var(--gold); border-style: dashed; }
-.accuse .pick .who.culprit span { color: var(--gold); }
-.accuse .pick .who.culprit span::after { content: " \00b7  culprit"; font: 700 10px "Cinzel", serif; letter-spacing: 0.1em; text-transform: uppercase; }
+/* A guest the player marked culprit, on the dock and, until the verdict, on
+   the accusation's tile. */
+.accuse:not(.closed) .pick .who.culprit:not(.on) { border-color: var(--gold); border-style: dashed; }
+.accuse:not(.closed) .pick .who.culprit span { color: var(--gold); }
+.accuse:not(.closed) .pick .who.culprit span::after { content: " \00b7  culprit"; font: 700 10px "Cinzel", serif; letter-spacing: 0.1em; text-transform: uppercase; }
 textarea.page { display: block; width: 100%; margin-top: 0.4em; padding: 0.4em 0.5em; resize: vertical;
   font: 15px/1.4 "Libre Caslon Text", serif; color: var(--bone); background: #0f0b09; border: 1px solid #3a2f22; }
 [data-mark="culprit"] img.head { outline: 2px solid var(--gold); outline-offset: -2px; }

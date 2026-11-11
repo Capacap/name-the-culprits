@@ -3,8 +3,7 @@
 //     house and her own lines carry underlined words, each bringing a
 //     caption of hers that says more; the Rules card is rules-play's.
 //   The dock holds the cast's heads, each opening a dossier, and the
-//     workspace's tools: Rules and House (the map, also shown while
-//     pointing at a room's name) open in the one card, and Notes (the
+//     workspace's tools: Rules and House (the plain map) open in the one card, and Notes (the
 //     player's page) in a pane of its own beside it; N, R and H open the
 //     three, Esc closes the card, then the notes. The dock's height is the
 //     root's --dock.
@@ -74,8 +73,7 @@ export function mount(ctx) {
   let open = null;
   const pop = document.getElementById("pop"), home = pop.parentElement;
   function show(key, build) {
-    // Closing the house clears the route a room's name lit.
-    if (card.contains(pop)) { home.append(pop); ctx.reader.light(null); }
+    if (card.contains(pop)) home.append(pop);
     open = open === key ? null : key;
     document.body.classList.toggle("carded", !!open);
     dock.querySelectorAll("[data-key]").forEach(b => b.classList.toggle("on", b.dataset.key === open));
@@ -115,19 +113,12 @@ export function mount(ctx) {
   rulesBtn.append(note);
   ctx.on("card", key => { if (key === "rules") note.remove(); });
   ctx.on("day", (_p, day) => { if (day >= 2) note.remove(); });
-  // The house is the map the corner showed, moved into the card while it is
-  // open. A room's name in the log opens it, lighting the route of the
-  // account the name is in (none for a name outside an account), and a
-  // guest's name opens their dossier, by tap or click alike (the user, 3
-  // November 2026: the map lights nothing by itself, since two accounts
-  // side by side are in view at once).
+  // The house is the plain map, moved into the card while it is open; it
+  // lights no route, since every account carries its own map (story.js).
+  // A guest's name in the log opens their dossier, by tap or click alike.
   const houseCard = () => el("div", {class: "housecard"}, el("h3", {}, "The house"), pop);
   const houseBtn = tool("house", "House", houseCard);
-  ctx.house = {toggle: () => show("house", houseCard), open: node => {
-    ctx.reader.light(ctx.reader.turnOf(node));
-    if (open !== "house") show("house", houseCard);
-  }};
-  houseOnDemand(log, houseBtn, ctx.house);
+  houseOnDemand(houseBtn, () => show("house", houseCard));
   log.addEventListener("click", e => {
     const id = e.target.closest(".guest-name")?.dataset.id;
     if (id && open !== id) show(id, () => dossier(id));

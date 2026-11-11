@@ -4,7 +4,8 @@
 //   A day opens on a wide panel of the house, the rooms where the bodies lay
 //     marked, Veronique presenting it.
 //   An account is a wide panel of the speaker alone, on alternating sides,
-//     their words under it.
+//     under it the house lit with the way the account walks that day, then
+//     their words. The map is the same on every screen and covers no art.
 //   An examination is a wide panel: the examiner grave, the dead a grey
 //     headshot beside them.
 //   A charge is a wide panel, the accused's headshot and the accuser
@@ -24,7 +25,7 @@
 //     the start and bows in one at the challenge.
 // Every figure is --frame tall (story.css) before its guest's zoom.
 
-import {reader, story, names, mark, el, svg, dayInView, deathMap, found} from "../reader.js";
+import {reader, story, names, mark, el, svg, dayInView, deathMap, found, accountMap} from "../reader.js";
 import {framed, cutout, preload, head, zoom} from "../cast.js";
 import {tools} from "../player/tools.js";
 import {context} from "../player/context.js";
@@ -62,7 +63,7 @@ function row(b) {
   const body = el("div", {class: "body"});
   log.insertBefore(p, b.entry);
   body.append(b.entry);
-  p.append(pn, body);
+  p.append(pn, accountMap(b.turn, b.day), body);
   blocks.push(p);
   return {block: p, col: body};
 }

@@ -34,17 +34,18 @@ function fit(t, line, size, room, weight = "700") {
 // each wall where it meets a room opens the doorway. Drawn `big` (by default
 // on a narrow screen, or where a view sets the map in a narrow box) the
 // rooms are taller with larger names, a name of two words on two lines, so
-// they stay legible at a phone's width. Returns show(turn), which lights the
+// they stay legible at a phone's width. With `trim` the picture is cut to
+// the house's own width, so a narrow house is drawn larger. Returns show(turn), which lights the
 // way the turn's account walks all day: the rooms it names with a sign for
 // each slot it puts its speaker there, the rooms passed between them unnamed
 // without one, and the doors walked; show(null) clears.
-export function drawMap(map, legend, big = innerWidth < 700) {
+export function drawMap(map, legend, big = innerWidth < 700, trim = false) {
   if (legend) legend.replaceChildren(slotLegend("#cfa75e"));
   map.classList.toggle("big", big);
   const {rooms, place, cols, rows} = grid(story);
   const W = 150, H = big ? 96 : 60, dx = (MAX_COLS - cols) * W / 2;
   const bw = 134, bh = big ? 80 : 44, r = big ? 10 : 7;
-  map.setAttribute("viewBox", `-3 -3 ${MAX_COLS * W + 6} ${rows * H + 6}`);
+  map.setAttribute("viewBox", trim ? `${dx - 3} -3 ${cols * W + 6} ${rows * H + 6}` : `-3 -3 ${MAX_COLS * W + 6} ${rows * H + 6}`);
   const centre = id => [dx + place[id][0] * W + W / 2, place[id][1] * H + H / 2];
   const halls = svg("g", {class: "halls"}), cuts = svg("g", {class: "cuts"});
   const door = (a, b) => [a, b].sort().join(" ");
@@ -131,6 +132,17 @@ export function deathMap(map, day, big) {
   }
 }
 
+// An account's map: the house cut to its own width, lit with the way the
+// account walks all day, the rooms where the day's bodies lay red. It
+// names no body, since two names do not fit a room and the red tells it
+// (the user, 11 November 2026). `day` counts from 1.
+export function accountMap(turn, day) {
+  const map = svg("svg", {class: "map"});
+  drawMap(map, null, true, true)(turn);
+  for (const {room} of found(day)) map.querySelector(`g[data-room="${room}"]`)?.classList.add("body");
+  return map;
+}
+
 // The reader. `view` holds:
 //   log, next, before (the node entries go before, or null for the end),
 //   map, legend (optional), bigMap (optional, drawMap's big),
@@ -141,16 +153,13 @@ export function deathMap(map, day, big) {
 //   more(entry, turn): optional, a turn that continues its speaker's last;
 //   title(h2, day): a day's title entered;
 //   settle(): after every step, to lay out and scroll.
-// The map lights only on light(). Returns {beats, step, light(turn),
-// turnOf(node), day(), at()}; light(turn) sets the map to an account's
-// route (null clears it), turnOf(node) is the account a node of the log
-// belongs to, and at() counts the steps taken.
+// The view's map is the plain house, lit by nothing. Returns {beats, step,
+// day(), at()}; at() counts the steps taken.
 export function reader(view) {
-  const show = view.map ? drawMap(view.map, view.legend, view.bigMap) : () => {};
+  if (view.map) drawMap(view.map, view.legend, view.bigMap)(null);
   const beats = [];
   let at = 0, day = 0, dayStart = true, lastKind = null;
   const dead = new Set();
-  const turnOf = new WeakMap();
 
   function entry(speaker, kind, lines, turn) {
     for (const e of view.log.querySelectorAll(".entry.current")) e.classList.remove("current");
@@ -165,7 +174,6 @@ export function reader(view) {
       text.append(span);
     }
     e.append(text);
-    if (turn?.places) turnOf.set(e, turn);
     view.log.insertBefore(e, view.before);
     return e;
   }
@@ -218,8 +226,7 @@ export function reader(view) {
   beat(first, {speaker: "narrator", kind: "narration"}, "doll-presenting");
   view.next.onclick = step;
   keys(Object.fromEntries(ADVANCE.map(k => [k, step])));
-  return {beats, step, light: turn => show(turn || null),
-          turnOf: node => turnOf.get(node?.closest(".entry")) || null, day: () => day, at: () => at};
+  return {beats, step, day: () => day, at: () => at};
 }
 
 // A node's top within the log's scrolled content, however deep it sits.
@@ -233,14 +240,9 @@ export function dayInView(log, latest) {
   return [...log.querySelectorAll("h2")].filter(h => topIn(log, h) <= mid).length;
 }
 
-// The house on demand: toggled by H or the `button`, and opened by a tap or
-// click on a room's name, so a touch screen reaches all a mouse does.
-// `house` shows it: toggle() for the button and H, open(node) for a click
-// on a room's name, the name's node.
-export function houseOnDemand(log, button, house) {
-  const pin = house.toggle, open = house.open;
-  button.onclick = pin;
-  addEventListener("keydown", e => { if (!e.target.closest?.("textarea, input, select") && e.key.toLowerCase() === "h" && !e.ctrlKey && !e.metaKey && !e.altKey) pin(); });
-  log.addEventListener("click", e => { const n = e.target.closest(".room-name"); if (n) open(n); });
+// The house on demand: `toggle` shows or hides it, by H or the `button`.
+export function houseOnDemand(button, toggle) {
+  button.onclick = toggle;
+  addEventListener("keydown", e => { if (!e.target.closest?.("textarea, input, select") && e.key.toLowerCase() === "h" && !e.ctrlKey && !e.metaKey && !e.altKey) toggle(); });
 }
 

@@ -35,13 +35,14 @@ export const OPENING = ["Welcome to my house. Keep in mind its rooms and its doo
 const UNLESS = ", unless a room says otherwise";
 
 // Each chain: [her line, its underlined word] a caption, the last with no
-// word. The "lie" chain and the trip chain's first two lines are
-// the user's (the trip line with "within one slot" and "the same way" put
+// word. The culprits chain's second line, the "lie" chain and the trip
+// chain's first two lines are the user's (the trip line with "within one slot" and "the same way" put
 // back, the omission line with "among my guests", since she leaves truths
 // out too); the rest is the session's wording. The house turn's words are
 // the story file's.
 export const CHAINS = {
-  culprits: {levels: [["There are no more than two culprits. A culprit kills at least once and is alive when the story ends; if there are two, both kill. A victim cannot be shared, though a room can."]]},
+  culprits: {levels: [["There are no more than two culprits. A culprit kills at least once and is alive when the story ends; if there are two, both kill. A victim cannot be shared, though a room can.", "shared"],
+    ["Two culprits can strike down two victims in the same spot as long as they do not leave a witness."]]},
   complete: {levels: [["Only a culprit can lie, other accounts are always true.", "true"],
     ["A lie by omission is still a lie: among my guests, only a culprit can choose to omit a fact."]]},
   narrator: {levels: [["I speak only truth, though not every truth.", "truth"],

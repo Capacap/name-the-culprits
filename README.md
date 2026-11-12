@@ -27,7 +27,7 @@ The checker needs Node 18 or later and nothing else. It prints one line per faul
 
 ## Playing and publishing
 
-`play/` is the library: every story in `stories/`, numbered, with a button that opens one this browser has not played yet. Each story opens in the game view, the same page with the story named, `play/?story=<id>` (`play/boot.js` picks the view), whose Library button and the link under a sealed accusation lead back. The browser keeps, per story, how far it was read (`play/player/save.js`, played back on a reload) and every team sealed (`play/progress.js`); the library shows which stories were solved and in how many accusations, and which had the truth opened. With `stories/` and `art/drawn/` in place, serve the repository's top folder and open `/play/`.
+`play/` is the library: every story in `stories/`, numbered, with a button that opens one this browser has not played yet. Each story opens in the game view, the same page with the story named, `play/?story=<id>` (`play/boot.js` picks the view), whose Library button and the link under a sealed accusation lead back. The browser keeps, per story, how far it was read and where its strip was scrolled (`play/player/save.js`, played back on a reload) and every team sealed (`play/progress.js`); the library shows which stories were solved and in how many accusations, and which had the truth opened. With `stories/` and `art/drawn/` in place, serve the repository's top folder and open `/play/`. The page serves its own fonts (`play/fonts/`, under the SIL Open Font License) and stays hidden until its view is built, for a second at most (`play/index.html`).
 
 ## The site
 

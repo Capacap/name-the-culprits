@@ -1,8 +1,9 @@
-/* Nothing moves while the page loads. --cinzel is the line height the
-   Cinzel face gives by itself, set on every element in that face so the
-   fallback shown until the face arrives stands as tall; the parts the
-   script fills hold their height while empty; and the scrollbar's gutter
-   is kept before the list makes the page scroll. */
+/* Nothing moves where the page is shown before its script or its fonts
+   are done (a load slower than index.html waits for, or one that failed).
+   --cinzel is the line height the Cinzel face gives by itself, set on
+   every element in that face so a fallback stands as tall, and the parts
+   the script fills hold their height while empty. The scrollbar's gutter
+   is kept, so a day tab that shortens the list moves nothing sideways. */
 :root { --gold: #c9a45c; --red: #e2493b; --dim: #9a8b76; --cinzel: 1.348; color-scheme: dark; scrollbar-gutter: stable; }
 * { box-sizing: border-box; }
 body { margin: 0; min-height: 100vh; background: radial-gradient(ellipse at 50% 0%, #2a1a12 0%, #0e0a08 60%); color: #e8dcc8; font: 17px/1.5 "Libre Caslon Text", Georgia, serif; }

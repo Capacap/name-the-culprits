@@ -226,6 +226,7 @@ export function reader(view) {
   const first = entry("narrator", "narration", story.objective.map(text => ({text})));
   beat(first, {speaker: "narrator", kind: "narration"}, "doll-presenting");
   view.next.onclick = step;
+  view.next.disabled = false;
   keys(Object.fromEntries(ADVANCE.map(k => [k, step])));
   return {beats, step, day: () => day, at: () => at};
 }

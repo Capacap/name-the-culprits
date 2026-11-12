@@ -1,6 +1,6 @@
 """Build the site's assets into dist/: the one page (play/), which is the
 library or the game, with only the files it loads, comments stripped and
-the portraits as WebP.
+the portraits as WebP. The font files ship as they are, with their licence.
 
     uv run --with pillow python deploy/build.py [--jobs N] [--site URL]
 
@@ -33,6 +33,8 @@ from PIL import Image
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DIST = os.path.join(ROOT, "dist")
 PAGES = ["play/index.html"]
+FONT = ".woff2"
+LICENCE = "play/fonts/OFL.txt"
 ART = "art/drawn"
 # The art the game loads, for the guests the library's stories name (see
 # art_ship): each guest's portrait, their mood pictures (cast.js MOODS) and
@@ -62,14 +64,18 @@ def refs(path, text):
             for r in found if local(r)]
 
 
-def walk():
-    """Every file the pages reach, from ROOT."""
-    seen, todo = set(), PAGES + ["play/progress.js"]
+def walk(start):
+    """Every file reached from `start`, from ROOT."""
+    seen, todo = set(), list(start)
     while todo:
         p = todo.pop()
         if p in seen:
             continue
         seen.add(p)
+        if p.endswith(FONT):
+            if not os.path.exists(os.path.join(ROOT, p)):
+                sys.exit("font %s is missing; nothing was built" % p)
+            continue
         with open(os.path.join(ROOT, p)) as fh:
             text = fh.read()
         todo += [r for r in refs(p, text) if r not in seen]
@@ -84,8 +90,36 @@ def to_webp(job):
     return os.path.getsize(src), os.path.getsize(dst)
 
 
+def named(page, key):
+    """The names a page's head script lists for each view under `key`
+    (index.html VIEW)."""
+    return [re.findall(r'"([^"]+)"', names) for names in re.findall(r"\b%s: \[([^\]]*)\]" % key, page)]
+
+
+def fonts_asked(path, page, fonts):
+    """Stop the build where the page at `path` asks at once for a font that
+    is not among `fonts`, the ones shipped."""
+    asked = named(page, "fonts")
+    if not asked or len(asked) != len(named(page, "modules")):
+        sys.exit("%s: VIEW does not give each view its fonts and modules" % path)
+    for name in sum(asked, []):
+        if os.path.join(os.path.dirname(path), "fonts", name + FONT) not in fonts:
+            sys.exit("%s asks for the font %s, which no stylesheet names" % (path, name))
+
+
+def preloads(path, page):
+    """The page with each view's first module replaced by every module that
+    one reaches, so the site asks for them all together."""
+    base = os.path.dirname(path)
+
+    def whole(m):
+        reached = walk(os.path.join(base, first) for first in named(m.group(0), "modules")[0])
+        return "modules: %s" % json.dumps([os.path.relpath(p, base) for p in reached])
+    return re.sub(r"\bmodules: \[[^\]]*\]", whole, page)
+
+
 def stage(files, tmp):
-    """The shipped sources, edited for the site, into `tmp`."""
+    """The shipped text sources, edited for the site, into `tmp`."""
     for p in files:
         with open(os.path.join(ROOT, p)) as fh:
             text = fh.read()
@@ -95,6 +129,7 @@ def stage(files, tmp):
         if p.endswith(".html"):
             text = re.sub(r"<!--.*?-->", "", text, flags=re.S)
             text = re.sub(r"<title>.*?</title>", "<title>The Loose Threads</title>", text)
+            text = preloads(p, text)
         out = os.path.join(tmp, p)
         os.makedirs(os.path.dirname(out), exist_ok=True)
         with open(out, "w") as fh:
@@ -167,9 +202,18 @@ def main():
     ap.add_argument("--site", help="the live site, whose unlisted stories are kept")
     args = ap.parse_args()
     kept = kept_stories(args.site) if args.site else {}
-    files = walk()
+    reached = walk(PAGES + ["play/progress.js"])
+    fonts = [p for p in reached if p.endswith(FONT)]
+    files = [p for p in reached if not p.endswith(FONT)]
     if "play/story/story.js" not in files:
         sys.exit("the game's module was not reached from the page")
+    # Fonts never ship without their licence, nor a page that asks for a
+    # font the site would lack.
+    if not os.path.exists(os.path.join(ROOT, LICENCE)):
+        sys.exit("%s is missing; nothing was built" % LICENCE)
+    for p in PAGES:
+        with open(os.path.join(ROOT, p)) as fh:
+            fonts_asked(p, fh.read(), fonts)
     # A library check.mjs faults (an older format, a broken verdict) never ships.
     if subprocess.run(["node", "check.mjs", "stories"], cwd=ROOT).returncode:
         sys.exit("check.mjs faults the library; nothing was built")
@@ -198,6 +242,9 @@ def main():
             if p.endswith(".html"):
                 os.makedirs(os.path.dirname(os.path.join(DIST, p)), exist_ok=True)
                 shutil.copy(os.path.join(tmp, p), os.path.join(DIST, p))
+    for p in fonts + [LICENCE]:
+        os.makedirs(os.path.dirname(os.path.join(DIST, p)), exist_ok=True)
+        shutil.copy(os.path.join(ROOT, p), os.path.join(DIST, p))
     os.makedirs(os.path.join(DIST, "stories"))
     for f in os.listdir(os.path.join(ROOT, "stories")):
         if f.endswith(".json"):
@@ -220,8 +267,8 @@ def main():
     with open(os.path.join(DIST, "_redirects"), "w") as fh:
         fh.write("/ /play/ 302\n")
     listed = len([f for f in os.listdir(os.path.join(ROOT, "stories")) if f.endswith(".json") and not f.endswith(".answer.json")]) - 1
-    print("%d code files, %d stories (%d kept unlisted), %d images (%.0f MB as PNG, %.0f MB as WebP)" % (
-        len(files), listed + len(kept), len(kept), len(jobs),
+    print("%d code files, %d fonts, %d stories (%d kept unlisted), %d images (%.0f MB as PNG, %.0f MB as WebP)" % (
+        len(files), len(fonts), listed + len(kept), len(kept), len(jobs),
         sum(a for a, _ in sizes) / 1e6, sum(b for _, b in sizes) / 1e6))
 
 

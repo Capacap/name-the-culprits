@@ -4,22 +4,40 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>The Loose Threads</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Text:ital,wght@0,400;0,700;1,400&family=Cinzel:wght@500;700&family=Playfair+Display:ital,wght@1,500&family=Grenze+Gotisch:wght@700;900&display=swap">
 <!-- One page, two views: the library, or with ?story=<id> the game. Each
      view's stylesheets and markup carry its name as their class, and the
-     two scripts below drop the other view's before anything is drawn. -->
+     scripts below drop the other view's before anything is drawn.
+     VIEW also names what the view asks for at once, where its script
+     would ask one file after another: the fonts its first screen is set
+     in (files of fonts/), its first module and, below, its data, at the
+     address play.js or shared.js fetches. deploy/build.py refuses a font
+     it does not ship and writes out each first module's whole graph.
+     The page is hidden until boot.js reveals it, or until SHOW_BY has
+     passed since this script ran, whatever has loaded by then. The game's
+     continue button is off until the reader gives it its step. -->
+<script>
+const STORY = new URLSearchParams(location.search).get("story");
+const VIEW = STORY
+  ? {drop: ".library", fonts: ["cinzel-latin", "libre-caslon-text-400-latin", "libre-caslon-text-700-latin"], modules: ["story/story.js"]}
+  : {drop: ".game", fonts: ["cinzel-latin", "libre-caslon-text-400-latin", "libre-caslon-text-italic-latin"], modules: ["play.js"]};
+const drop = () => { for (const n of document.querySelectorAll(VIEW.drop)) n.remove(); };
+const ask = (rel, href, more) => document.head.append(Object.assign(document.createElement("link"), {rel, href, ...more}));
+for (const font of VIEW.fonts) ask("preload", `fonts/${font}.woff2`, {as: "font", type: "font/woff2", crossOrigin: "anonymous"});
+ask("preload", `../stories/${STORY || "index"}.json`, {as: "fetch", crossOrigin: "anonymous"});
+for (const module of VIEW.modules) ask("modulepreload", module);
+const SHOW_BY = 1000;  // ms
+const reveal = () => document.documentElement.classList.add("ready");
+setTimeout(reveal, SHOW_BY);
+</script>
+<style>html:not(.ready) body > * { visibility: hidden; }</style>
+<noscript><style>html:not(.ready) body > * { visibility: visible; }</style></noscript>
+<link rel="stylesheet" href="fonts.css">
 <link rel="stylesheet" href="play.css" class="library">
 <link rel="stylesheet" href="reader.css" class="game">
 <link rel="stylesheet" href="story/story.css" class="game">
 <link rel="stylesheet" href="player/player.css" class="game">
 <link rel="stylesheet" href="story/tools.css" class="game">
-<script>
-const OTHER = new URLSearchParams(location.search).get("story") ? ".library" : ".game";
-const drop = () => { for (const n of document.querySelectorAll(OTHER)) n.remove(); };
-drop();
-</script>
+<script>drop();</script>
 </head>
 <body>
 <main class="library">
@@ -35,7 +53,7 @@ drop();
   <div class="more"><button id="random">Random story</button></div>
   <ol id="stories" class="stories"></ol>
 </main>
-<div id="log" class="log game"><button id="next" class="next quiet">continue</button><div id="spacer"></div></div>
+<div id="log" class="log game"><button id="next" class="next quiet" disabled>continue</button><div id="spacer"></div></div>
 <div id="pop" class="game"><div id="legend" class="legend-row"></div><svg id="map" class="map"></svg></div>
 <script>drop();</script>
 <script type="module" src="boot.js"></script>

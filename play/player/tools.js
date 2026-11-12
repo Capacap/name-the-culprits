@@ -230,6 +230,9 @@ export function tools(ctx) {
   // fails; the truth's names the culprits, with their lies and the wrong
   // teams that came closest behind pressed words, then tells each day. Its
   // lines come as they load; a failed load says so.
+  const loading = [];
+  // Settles once the lines of every panel made so far have come, or failed.
+  const loaded = () => Promise.all(loading);
   function panel(team, how) {
     const box = el("div", {class: `herpanel ${how}`});
     // She smiles at a team seen through, framed as the story's panels frame
@@ -246,10 +249,10 @@ export function tools(ctx) {
     // A failed fetch, or a file this view cannot read, says so.
     const failed = () => first.querySelector(".text").append(line("The rest did not load. Reload the page to try once more."));
     if (how === "wrong") {
-      verdictOf(team).then(lines => first.querySelector(".text").append(...(lines || []).map(t => line(t)))).catch(failed);
+      loading.push(verdictOf(team).then(lines => first.querySelector(".text").append(...(lines || []).map(t => line(t)))).catch(failed));
       return box;
     }
-    answer().then(a => {
+    loading.push(answer().then(a => {
       const {team: culprits, told: {days, lies}, rivals} = a;
       const who = listOf(culprits), two = culprits.length > 1;
       const pron = story.cast.find(c => c.id === culprits[0]).pronouns.split("/")[0];
@@ -270,7 +273,7 @@ export function tools(ctx) {
         ? line(`You may see ${poss} `, liesWord(), ", and why no ", others(), " fit.")
         : line("You may see why no ", others(), " fit."));
       for (const d of days) text.append(line(el("span", {class: "daytitle"}, d.title), ...d.lines.map(t => ` ${t}`)));
-    }).catch(failed);
+    }).catch(failed));
     return box;
   }
   // Names in alphabetical order, as her lines give a team.
@@ -305,5 +308,5 @@ export function tools(ctx) {
   const ORDINAL = ["first", "second", "third", "fourth", "fifth", "sixth", "seventh"];
   const check = async team => hex(await sha(seedOf(team))) === story.check;
 
-  return {guests, examined, notes, save, watchers, markOf, culprit, markChips, markTable, page, head, scrollTo, accusation};
+  return {guests, examined, notes, save, watchers, markOf, culprit, markChips, markTable, page, head, scrollTo, accusation, loaded};
 }

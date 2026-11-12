@@ -221,10 +221,11 @@ function settle() {
 ctx.tools = tools(ctx);
 document.body.classList.add("ui-dock");
 workspace(ctx);
-// A reading played back (save.js) returns to the place it was left at:
-// now, before the page shows, and again once the fonts have set the text
-// and the strip has settled on its last step.
+// Once the fonts have set the text, and her panels on a finished story
+// have their lines (tools.js), the strip settles on its step. A reading
+// played back (save.js) returns instead to the place it was left at: now,
+// before the page shows, and again then.
 ctx.place?.();
-await document.fonts.ready;
-settle();
-ctx.place?.();
+await Promise.all([document.fonts.ready, ctx.tools.loaded()]);
+if (ctx.place) ctx.place(true);
+else settle();

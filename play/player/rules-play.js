@@ -41,7 +41,7 @@ const UNLESS = ", unless a room says otherwise";
 // out too); the rest is the session's wording. The house turn's words are
 // the story file's.
 export const CHAINS = {
-  culprits: {levels: [["There are no more than two culprits. A culprit kills at least once and is alive when the story ends; if there are two, both kill. A murder cannot be shared."]]},
+  culprits: {levels: [["There are no more than two culprits. A culprit kills at least once and is alive when the story ends; if there are two, both kill. A victim cannot be shared, though a room can."]]},
   complete: {levels: [["Only a culprit can lie, other accounts are always true.", "true"],
     ["A lie by omission is still a lie: among my guests, only a culprit can choose to omit a fact."]]},
   narrator: {levels: [["I speak only truth, though not every truth.", "truth"],

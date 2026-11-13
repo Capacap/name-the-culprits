@@ -1,7 +1,7 @@
 /* The game view's strip: every figure at one scale (--frame, the height of
    a whole 2:3 frame, zoomed per guest so the heads come out one size),
-   panels with no box and no room behind the figures, every panel one height
-   and every text the column's width. */
+   panels with no box, a guest's set taller than the rest (.panel.set), and
+   every text the column's width. */
 
 :root {
   --col: min(720px, 100% - 2.4rem); --wide: min(960px, 100% - 1.2em);
@@ -30,6 +30,27 @@
 .past.panel, .pair.past .panel { filter: brightness(0.45) saturate(0.6); }
 .panel .caption { position: absolute; z-index: 2; left: 0.9em; bottom: 0.7em; font: 600 15px "Cinzel", serif; letter-spacing: 0.12em; color: var(--gold); text-shadow: 0 1px 4px #000; }
 .panel .caption svg { vertical-align: -3px; color: var(--gold); }
+
+/* A guest with a set (cast.js SETS): the panel is taller, ruled in gold at
+   its top and bottom, and holds the guest's place (.plate) with the guest
+   cut out over it (img.cut), both fading out at the panel's sides. The
+   figure is the plate's scale times --s, which brings every guest's face
+   to one height, and never so small that its canvas ends above the
+   panel's bottom; its hair's top (--hair down its canvas) stands --head
+   percent of the panel's height under the panel's top; its face's middle
+   stands --wide percent across a wide panel, --narrow across a narrow one. */
+#log .panel.set { height: calc(var(--frame) * 0.72); }
+.panel.set::before, .panel.set::after { content: ""; position: absolute; z-index: 3; left: 0; right: 0; height: 2px;
+  background: linear-gradient(to right, transparent, var(--gold) 12%, var(--gold) 88%, transparent); opacity: 0.85; }
+.panel.set::before { top: 0; } .panel.set::after { bottom: 0; }
+.place { position: absolute; inset: 0; container-type: size;
+  mask-image: linear-gradient(to right, transparent, #000 7%, #000 93%, transparent); }
+.place .plate { position: absolute; inset: 0; background-size: cover; }
+.place img.cut { position: absolute; z-index: 1; max-width: none;
+  --h: max(calc(max(100cqh, 66.667cqw) * var(--s)), calc((100 - var(--head)) * 1cqh / (1 - var(--hair))));
+  height: var(--h); width: calc(var(--h) * 1.5); top: calc(var(--head) * 1cqh - var(--hair) * var(--h));
+  --at: var(--wide); left: calc(var(--at) * 1cqw - var(--face) * var(--h) * 1.5); }
+@container (max-width: 640px) { .place img.cut { --at: var(--narrow); } }
 
 /* An account: a wide panel of the speaker alone, on alternating sides, the
    words under it as wide as the text column. The block spans #log and its
@@ -70,6 +91,8 @@
 .panel.examination:has(.head + .head) .behind { padding-left: 4%; gap: 3%; }
 .panel.examination:has(.head + .head) .head { --hs: calc(var(--frame) * 0.56 * 0.5); }
 .panel.examination:has(.head + .head) .fig { right: 4%; }
+/* Three bodies: smaller again, so the third stands clear of the examiner. */
+.panel.examination:has(.head + .head + .head) .head { --hs: calc(var(--frame) * 0.56 * 0.42); }
 
 /* A charge: the accused's headshot at the left, the accuser pointing at it
    from the right, so the arm points toward the accused; the words are in
@@ -99,5 +122,6 @@
   /* On a phone two headshots stack at the left, smaller. */
   .panel.examination:has(.head + .head) .behind { flex-direction: column; justify-content: center; align-items: flex-start; gap: 3%; }
   .panel.examination:has(.head + .head) .head { --hs: calc(var(--frame) * 0.56 * 0.42); }
+  .panel.examination:has(.head + .head + .head) .head { --hs: calc(var(--frame) * 0.56 * 0.36); }
   #log .entry.narrator .slotsign { position: static; width: auto; vertical-align: -1px; margin-right: 0.3em; }
 }

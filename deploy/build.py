@@ -1,6 +1,6 @@
 """Build the site's assets into dist/: the one page (play/), which is the
 library or the game, with only the files it loads, comments stripped and
-the portraits as WebP. The font files ship as they are, with their licence.
+the pictures as WebP. The font files ship as they are, with their licence.
 
     uv run --with pillow python deploy/build.py [--jobs N] [--site URL]
 
@@ -37,11 +37,13 @@ FONT = ".woff2"
 LICENCE = "play/fonts/OFL.txt"
 ART = "art/drawn"
 # The art the game loads, for the guests the library's stories name (see
-# art_ship): each guest's portrait, their mood pictures (cast.js MOODS) and
-# dock head, and Veronique's portrait, her two moods (cast.js HER) and her head. The placeholder guests' framed
+# art_ship): each guest's portrait, their set's plates and figures (cast.js
+# SETS), their mood pictures (cast.js MOODS) and
+# their dock head, and Veronique's portrait, her two moods (cast.js HER) and
+# her head. The placeholder guests' framed
 # figures and faces (cast.js OWN) are not shipped, since no story in the
 # library names them.
-# The portraits' longest side on the site; the source is 1536.
+# A picture's longest side on the site; the source is 1536.
 ART_SIDE = 1024
 ART_QUALITY = 80
 
@@ -124,7 +126,7 @@ def stage(files, tmp):
         with open(os.path.join(ROOT, p)) as fh:
             text = fh.read()
         if p.endswith(".js"):
-            # The portraits ship as WebP.
+            # The pictures ship as WebP.
             text = text.replace('.png`', '.webp`')
         if p.endswith(".html"):
             text = re.sub(r"<!--.*?-->", "", text, flags=re.S)
@@ -185,14 +187,15 @@ def art_ship(kept):
     with open(os.path.join(ROOT, "play", "cast.js")) as fh:
         cast_js = fh.read()
     const = lambda name: json.loads(re.search(r"^export const %s = (.*?);$" % name, cast_js, re.M | re.S).group(1))
-    moods, heads, her = const("MOODS"), const("HEADS"), const("HER")
+    moods, heads, her, sets = const("MOODS"), const("HEADS"), const("HER"), const("SETS")
     # A guest the view would show at the placeholder's crop and zoom (cast.js
     # OWN_HEAD) never ships: every guest a story names has a HEADS line.
     unplaced = [g for g in guests if g not in heads]
     if unplaced:
         sys.exit("no HEADS line in play/cast.js for %s" % ", ".join(unplaced))
     pictures = ["%s@%s-%d" % (g, m, i) for g in guests for m, n in sorted(moods.get(g, {}).items()) for i in range(1, n + 1)]
-    return {"hand": guests + pictures + ["narrator"] + ["narrator@%s" % m for m in her], "icon": guests + ["narrator"]}
+    places = ["%s@%s%s" % (g, m, part) for g in guests for m in sorted(sets.get(g, {})) for part in ("", "-plate")]
+    return {"hand": guests + pictures + ["narrator"] + ["narrator@%s" % m for m in her], "icon": guests + ["narrator"], "set": places}
 
 
 def main():

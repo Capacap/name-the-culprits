@@ -3,7 +3,8 @@
 // The strip:
 //   A day opens on a wide panel of the house, the rooms where the bodies lay
 //     marked, Veronique presenting it.
-//   An account is a wide panel of the speaker alone, on alternating sides,
+//   An account is a wide panel of the speaker alone, on alternating sides
+//     (a guest with a set of places stands at the left of theirs),
 //     under it the house lit with the way the account walks that day, then
 //     their words. The map is the same on every screen and covers no art.
 //     Beside the speaker's name stand the player's marks for them.
@@ -14,8 +15,11 @@
 //   Every figure is zoomed so the cast's heads come out one size. The account that
 //     follows a charge stands named under its panel; after an
 //     examination it is a panel of its own.
-//   Every panel is one height and every text one width, the column's.
-//   No room is drawn behind the figures.
+//   Every text is one width, the column's, and every panel one height but
+//     for a guest's set, which is taller.
+//   A guest with a set (cast.js SETS) stands cut out over a place of their
+//     own, in the turn's mood, in a taller panel; no room of the house is
+//     drawn behind a figure.
 //   A line that names a slot has the slot's sign before it and its word set
 //     bold.
 //   The lines a charge is about are marked, in the accuser's account and in
@@ -27,7 +31,7 @@
 // Every figure is --frame tall (story.css) before its guest's zoom.
 
 import {reader, story, names, mark, el, svg, dayInView, deathMap, found, accountMap} from "../reader.js";
-import {framed, cutout, preload, head, zoom} from "../cast.js";
+import {framed, cutout, preload, head, zoom, set} from "../cast.js";
 import {tools} from "../player/tools.js";
 import {context} from "../player/context.js";
 import {mount as workspace} from "../player/workspace.js";
@@ -39,6 +43,16 @@ preload(story.cast.map(c => c.id));
 const img = (src, cls = "") => el("img", {class: cls, src, alt: ""});
 // A character's figure, zoomed so the cast's heads come out one size (cast.js HEADS).
 const fig = (who, mood, key, cls = "fig") => { const i = img(framed(who, mood, key), cls); i.style.cssText = zoom(who); return i; };
+// The speaker in a panel: over their own place where they have a set for
+// the mood (cast.js set, story.css .place), otherwise their figure.
+function stand(p, who, mood, key, cls) {
+  const s = set(who, mood);
+  if (!s) return p.append(fig(who, mood, key, cls));
+  const figure = img(s.figure, "cut");
+  figure.style.cssText = s.style;
+  p.classList.add("set");
+  p.prepend(el("div", {class: "place"}, el("div", {class: "plate", style: `background-image: url("${s.plate}"); ${s.at}`}), figure));
+}
 // A character's headshot, the square around their head in the picture given (story.css .head).
 const headshot = (who, src) => el("div", {class: "head", style: `${head(who)}; background-image: url("${src}")`});
 function panel(kind, day) {
@@ -64,7 +78,7 @@ function row(b) {
   p.dataset.day = b.day;
   const pn = panel("together", b.day);
   pn.classList.remove("new");
-  pn.append(fig(b.turn.speaker, "neutral", "", `fig ${side ? "a" : "b"}`));
+  stand(pn, b.turn.speaker, "neutral", "", `fig ${side ? "a" : "b"}`);
   const body = el("div", {class: "body"});
   log.insertBefore(p, b.entry);
   body.append(b.entry);
@@ -85,7 +99,8 @@ function wide(b) {
     const p = panel(kind, b.day);
     const behind = el("div", {class: "behind"});
     for (const id of ids) behind.append(headshot(id, src(id)));
-    p.append(behind, fig(who, mood, b.i));
+    p.append(behind);
+    stand(p, who, mood, b.i);
     return p;
   };
   // The accused's headshot comes from their accused picture where they have one.

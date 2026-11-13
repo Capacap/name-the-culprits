@@ -8,6 +8,8 @@
 // on the story's last day and smiling at a team seen through. The twelve
 // placeholder guests the stories named before 6 November 2026 (OWN) keep
 // their own framed figures and cut-out closeups. A mood a character lacks falls back to their first.
+// A guest in SETS speaks in a place of their own instead: the place (a plate)
+// and the guest cut out over it (a figure), one pair per mood, in art/drawn/set.
 
 import {ART, STORY} from "./shared.js";
 
@@ -15,9 +17,10 @@ const GUESTS = ["alice", "bram", "cora", "dana", "emil", "fay", "gale", "hana", 
 const OWN = new Set(GUESTS);
 // The moods a guest has pictures of, and how many of each, drawn as
 // art/drawn/hand/<who>@<mood>-<n> (n from 1): "accusing" for a charge,
-// "grave" for an examination, "accused" for the headshot under a charge. deploy/build.py
-// reads this object as JSON, so it stays JSON.
-export const MOODS = {"ada": {"accusing": 2, "grave": 2, "accused": 2}, "clementine": {"accusing": 2, "grave": 2, "accused": 2}, "sterling": {"accusing": 1, "grave": 1, "accused": 1}, "ilya": {"accusing": 1, "grave": 1, "accused": 1}, "lucian": {"accusing": 1, "grave": 1, "accused": 1}, "ottilie": {"accusing": 1, "grave": 1, "accused": 1}, "terry": {"accusing": 1, "grave": 1, "accused": 1}, "henrietta": {"accusing": 1, "grave": 1, "accused": 1}, "valentin": {"accusing": 1, "grave": 1, "accused": 1}, "winnie": {"accusing": 1, "grave": 1, "accused": 1}, "anselme": {"accusing": 1, "grave": 1, "accused": 1}, "robin": {"accusing": 1, "grave": 1, "accused": 1}, "philippa": {"accusing": 1, "grave": 1, "accused": 1}};
+// "grave" for an examination, "accused" for the headshot under a charge. A
+// mood a guest's set shows (SETS) is not listed, so every picture listed is
+// one the game shows. deploy/build.py reads this object as JSON, so it stays JSON.
+export const MOODS = {"ada": {"accused": 2}, "clementine": {"accused": 2}, "sterling": {"accused": 1}, "ilya": {"accused": 1}, "lucian": {"accused": 1}, "ottilie": {"accused": 1}, "terry": {"accused": 1}, "henrietta": {"accused": 1}, "valentin": {"accused": 1}, "winnie": {"accused": 1}, "anselme": {"accused": 1}, "robin": {"accused": 1}, "philippa": {"accused": 1}};
 // Where each guest's head is in their 1024x1536 portrait, set by eye: the
 // centre and side of a square around it, which cuts the dock icon
 // and the headshot of an accused or dead guest, and the
@@ -44,6 +47,34 @@ export function head(who) {
   cx = Math.min(Math.max(cx, side / 2), 1024 - side / 2);
   cy = Math.min(Math.max(cy, side / 2), 1536 - side / 2);
   return `--hx: ${cx}; --hy: ${cy}; --hside: ${side}`;
+}
+// A guest's set: per mood ("neutral" for an account, "accusing", "grave"),
+// where the face's middle is across the figure's 3:2 canvas in percent, the
+// face's height and the row of the hair's top on its 1024 rows, and, where
+// an account's figure stands elsewhere on a wide panel than on its plate,
+// that place in percent. A figure is art/drawn/set/<who>@<mood> and its
+// plate, the same canvas, <who>@<mood>-plate. A figure redrawn needs its
+// line measured again. deploy/build.py reads this object as JSON, so it
+// stays JSON.
+export const SETS = {"ada": {"neutral": [30, 175, 5], "accusing": [75, 182, 8], "grave": [74, 221, 24]}, "anselme": {"neutral": [26, 164, 33], "accusing": [70, 199, 40], "grave": [70, 183, 21]}, "clementine": {"neutral": [21, 197, 15], "accusing": [76, 201, 1], "grave": [76, 189, 10]}, "henrietta": {"neutral": [28, 179, 18], "accusing": [68, 175, 18], "grave": [71, 172, 22]}, "ilya": {"neutral": [24, 180, 25], "accusing": [71, 183, 44], "grave": [70, 158, 28]}, "lucian": {"neutral": [27, 163, 13], "accusing": [72, 169, 44], "grave": [70, 163, 39]}, "ottilie": {"neutral": [29, 160, 23, 35], "accusing": [74, 181, 28], "grave": [75, 196, 40]}, "philippa": {"neutral": [27, 173, 18], "accusing": [68, 188, 37], "grave": [68, 173, 32]}, "robin": {"neutral": [25, 183, 23], "accusing": [70, 204, 19], "grave": [68, 173, 39]}, "sterling": {"neutral": [27, 164, 50], "accusing": [72, 186, 34], "grave": [72, 163, 26]}, "terry": {"neutral": [26, 172, 19], "accusing": [70, 182, 8], "grave": [67, 168, 16]}, "valentin": {"neutral": [25, 194, 19], "accusing": [69, 209, 43], "grave": [70, 183, 65]}, "winnie": {"neutral": [22, 186, 18], "accusing": [69, 172, 72], "grave": [72, 198, 62]}};
+// Every figure of a set is scaled so its face is this many rows of the
+// plate's 1024 tall, and its hair's top stands this many percent of the
+// panel's height under the panel's top (story.css .place).
+const SET_FACE = 200, SET_HEADROOM = 6;
+// On a narrow panel the face stands this far across: an account's figure
+// at the left, a charge's and an examination's at the right.
+const SET_NARROW = {neutral: 38, accusing: 64, grave: 64};
+// A guest's set for a mood, or nothing: the plate, the figure and the
+// style that places each (story.css .place).
+export function set(who, mood) {
+  const s = SETS[who]?.[mood];
+  if (!s) return null;
+  const [face, tall, hair, wide = face] = s;
+  return {
+    plate: `${ART}/set/${who}@${mood}-plate.png`, at: `background-position: ${face}% 0`,
+    figure: `${ART}/set/${who}@${mood}.png`,
+    style: `--face: ${face / 100}; --wide: ${wide}; --narrow: ${SET_NARROW[mood]}; --s: ${(SET_FACE / tall).toFixed(3)}; --hair: ${(hair / 1024).toFixed(4)}; --head: ${SET_HEADROOM}`,
+  };
 }
 const portrait = who => `${ART}/hand/${who}.png`;
 // Which of a mood's n pictures a turn shows, the same on every reading of
@@ -84,6 +115,7 @@ export function preload(guests) {
       if (who === "narrator") for (const m of HER) new Image().src = framed(who, m);
       for (const [m, n] of Object.entries(MOODS[who] || {}))
         for (let i = 1; i <= n; i++) new Image().src = `${ART}/hand/${who}@${m}-${i}.png`;
+      for (const m of Object.keys(SETS[who] || {})) { const s = set(who, m); new Image().src = s.plate; new Image().src = s.figure; }
     } else {
       new Image().src = cutout(who);
       for (const m of FRAMED) new Image().src = framed(who, m);

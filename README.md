@@ -9,7 +9,7 @@ This repository is the game's frontend: the game view, the library page that ope
 This repository is published to show the code. It leaves out two things the game needs, so a clone cannot serve it, build the site or deploy it:
 
 - **The stories.** A generator that is kept private writes them. The game reads them from `stories/`, which is not in the repository.
-- **The pictures.** The characters' portraits are read from `art/drawn/`, which is not in the repository either.
+- **The pictures.** The characters' portraits, and the places they stand in, are read from `art/drawn/`, which is not in the repository either.
 
 Without them the library page lists no stories and `deploy/build.py` stops before it builds anything. The commands below are for the machine that holds both folders. To play the game, use the site linked above.
 
@@ -45,7 +45,7 @@ uv run --with pillow python deploy/build.py [--site https://the.live.site]
 npx wrangler deploy
 ```
 
-The build copies only what the library and the game load, minifies the code without its comments, and converts the portraits to WebP. It needs `stories/` and `art/drawn/`, so it runs on the machine that holds them. With `--site`, the stories the live site holds that the library no longer lists are shipped unlisted, so an old link or a half-read story still opens; a story whose format the game no longer reads is dropped then.
+The build copies only what the library and the game load, minifies the code without its comments, and converts the pictures to WebP. It needs `stories/` and `art/drawn/`, so it runs on the machine that holds them. With `--site`, the stories the live site holds that the library no longer lists are shipped unlisted, so an old link or a half-read story still opens; a story whose format the game no longer reads is dropped then.
 
 To run the site on this machine, build `dist/`, make the local database and start the dev server, which serves `dist/` and the Worker together:
 
@@ -62,4 +62,4 @@ A player is never identified. When a story is opened the game makes a random id 
 
 ## The game view
 
-`play/story/` holds the game: the story as one strip read downward, every account a wide panel of its speaker, then the house lit with the way the account walks that day, then the words, and the player's workspace over it (`play/player/`): the marks beside each account, a guest's card opened from their name, and a dock of the Rules, House, Notes and Library buttons. Veronique tells the rules in play (`play/player/rules-play.js`). It loads the shared reader and helpers in `play/` and the art in `art/drawn/`. `?story=<id>` picks the story.
+`play/story/` holds the game: the story as one strip read downward, every account a wide panel of its speaker, cut out over a place of their own that changes with the turn's mood, then the house lit with the way the account walks that day, then the words, and the player's workspace over it (`play/player/`): the marks beside each account, a guest's card opened from their name, and a dock of the Rules, House, Notes and Library buttons. Veronique tells the rules in play (`play/player/rules-play.js`). It loads the shared reader and helpers in `play/` and the art in `art/drawn/`. `?story=<id>` picks the story.

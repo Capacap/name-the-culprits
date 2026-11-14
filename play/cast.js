@@ -35,11 +35,11 @@ export const MOODS = {"ada": {"accused": 1}, "anselme": {"accused": 1}, "clement
 // all. A portrait redrawn needs its line looked at again, and a new guest
 // one of their own. The tool that cuts the icons reads this object as JSON,
 // so it stays JSON.
-export const HEADS = {"ada": [512, 315, 440, 100], "anselme": [520, 400, 560, 114], "clementine": [512, 330, 680, 140], "henrietta": [490, 270, 700, 90], "ilya": [520, 370, 420, 79], "lucian": [450, 310, 420, 78], "ottilie": [480, 300, 520, 85], "philippa": [500, 330, 500, 95], "robin": [360, 360, 420, 80], "sterling": [500, 240, 420, 78], "terry": [430, 410, 560, 99], "valentin": [523, 440, 500, 97], "winnie": [480, 290, 460, 84], "narrator": [512, 330, 440, 111]};
+export const HEADS = {"ada": [512, 300, 380, 76], "anselme": [535, 395, 570, 114], "clementine": [512, 300, 520, 104], "henrietta": [490, 290, 560, 95], "ilya": [524, 375, 395, 79], "lucian": [461, 312, 390, 78], "ottilie": [500, 290, 470, 94], "philippa": [525, 315, 475, 95], "robin": [365, 361, 400, 80], "sterling": [523, 230, 390, 78], "terry": [430, 430, 540, 99], "valentin": [523, 445, 485, 97], "winnie": [491, 290, 440, 84], "narrator": [512, 330, 440, 111]};
 // Where each guest's head is in their accused picture, as in HEADS: the
 // centre and side of the square a charge shows. A picture redrawn needs
 // its line looked at again.
-export const ACCUSED = {"ada": [519, 240, 440], "anselme": [489, 225, 440], "clementine": [468, 255, 460], "henrietta": [470, 230, 620], "ilya": [493, 275, 440], "lucian": [520, 200, 440], "ottilie": [491, 215, 460], "philippa": [538, 240, 440], "robin": [494, 245, 440], "sterling": [525, 215, 440], "terry": [455, 220, 500], "valentin": [441, 240, 440], "winnie": [448, 250, 460]};
+export const ACCUSED = {"ada": [519, 244, 415], "anselme": [489, 230, 420], "clementine": [468, 258, 440], "henrietta": [470, 250, 500], "ilya": [481, 300, 435], "lucian": [530, 205, 430], "ottilie": [491, 211, 435], "philippa": [538, 244, 430], "robin": [494, 250, 450], "sterling": [525, 214, 435], "terry": [455, 235, 470], "valentin": [441, 250, 430], "winnie": [448, 252, 450]};
 const FACE_REF = 100;
 // The placeholder guests' closeups (OWN) all have the head in one place.
 const OWN_HEAD = [512, 360, 680, 100];

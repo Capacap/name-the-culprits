@@ -1,9 +1,9 @@
 // Every character's pictures (art/drawn, which this repository does not
 // keep; README.md). A guest has one
-// portrait in art/drawn/hand, shown for an account, for every mood they have
-// no picture of and as the headshot of a dead guest, and a head cut from it
-// for the icons. A guest in MOODS has pictures of those moods
-// too. Veronique (narrator) has hers, at work with her eyes on her
+// portrait in art/drawn/hand, shown for every mood they have neither a set
+// nor a picture of and as the headshot of an accused or dead guest, and a
+// head cut from it for the icons. A guest in MOODS has pictures of those
+// moods too. Veronique (narrator) has hers, at work with her eyes on her
 // sewing, and the same picture in two moods (HER): looking up at the player
 // on the story's last day and smiling at a team seen through. The twelve
 // placeholder guests the stories named before 6 November 2026 (OWN) keep
@@ -20,20 +20,21 @@ const OWN = new Set(GUESTS);
 // "grave" for an examination, "accused" for the headshot under a charge. A
 // mood a guest's set shows (SETS) is not listed, so every picture listed is
 // one the game shows. deploy/build.py reads this object as JSON, so it stays JSON.
-export const MOODS = {"ada": {"accused": 2}, "clementine": {"accused": 2}, "sterling": {"accused": 1}, "ilya": {"accused": 1}, "lucian": {"accused": 1}, "ottilie": {"accused": 1}, "terry": {"accused": 1}, "henrietta": {"accused": 1}, "valentin": {"accused": 1}, "winnie": {"accused": 1}, "anselme": {"accused": 1}, "robin": {"accused": 1}, "philippa": {"accused": 1}};
+export const MOODS = {};
 // Where each guest's head is in their 1024x1536 portrait, set by eye: the
 // centre and side of a square around it, which cuts the dock icon
 // and the headshot of an accused or dead guest, and the
 // face's size as measured from a fitted face mesh (100 a
-// face at the cast's middle distance; Henrietta's is set by eye between
-// Ottilie's and Ilya's, since her veil hides her face from the mesh),
+// face at the cast's middle distance; Ada's, Clementine's, Henrietta's and
+// Ottilie's are set by eye against the others, since the mesh finds no
+// face in their portraits),
 // which sets the zoom that brings every guest's face to one size
 // (FACE_REF). The edits that make a
 // guest's mood pictures keep the portrait's framing, so one box serves them
 // all. A portrait redrawn needs its line looked at again, and a new guest
 // one of their own. The tool that cuts the icons reads this object as JSON,
 // so it stays JSON.
-export const HEADS = {"ada": [450, 200, 520, 85], "anselme": [630, 240, 520, 127], "clementine": [512, 400, 520, 107], "henrietta": [540, 230, 520, 96], "ilya": [560, 260, 520, 94], "lucian": [500, 260, 520, 91], "ottilie": [600, 260, 520, 96], "philippa": [510, 280, 520, 103], "robin": [380, 380, 520, 101], "sterling": [560, 250, 520, 84], "terry": [520, 320, 540, 117], "valentin": [520, 290, 520, 120], "winnie": [560, 220, 520, 103], "narrator": [512, 330, 440, 111]};
+export const HEADS = {"ada": [512, 315, 440, 100], "anselme": [520, 400, 560, 114], "clementine": [512, 330, 680, 140], "henrietta": [490, 270, 700, 90], "ilya": [520, 370, 420, 79], "lucian": [450, 310, 420, 78], "ottilie": [480, 300, 520, 85], "philippa": [500, 330, 500, 95], "robin": [360, 360, 420, 80], "sterling": [500, 240, 420, 78], "terry": [430, 410, 560, 99], "valentin": [523, 440, 500, 97], "winnie": [480, 290, 460, 84], "narrator": [512, 330, 440, 111]};
 const FACE_REF = 100;
 // The placeholder guests' closeups (OWN) all have the head in one place.
 const OWN_HEAD = [512, 360, 680, 100];

@@ -54,7 +54,7 @@ function stand(p, who, mood, key, cls) {
   p.prepend(el("div", {class: "place"}, el("div", {class: "plate", style: `background-image: url("${s.plate}"); ${s.at}`}), figure));
 }
 // A character's headshot, the square around their head in the picture given (story.css .head).
-const headshot = (who, src) => el("div", {class: "head", style: `${head(who)}; background-image: url("${src}")`});
+const headshot = (who, src, mood) => el("div", {class: "head", style: `${head(who, mood)}; background-image: url("${src}")`});
 function panel(kind, day) {
   const p = el("figure", {class: `panel ${kind} new`});
   p.dataset.day = day;
@@ -98,12 +98,12 @@ function wide(b) {
   const faced = (kind, mood, ids, src) => {
     const p = panel(kind, b.day);
     const behind = el("div", {class: "behind"});
-    for (const id of ids) behind.append(headshot(id, src(id)));
+    for (const id of ids) behind.append(headshot(id, src(id), kind === "charge" ? "accused" : ""));
     p.append(behind);
     stand(p, who, mood, b.i);
     return p;
   };
-  // The accused's headshot comes from their accused picture where they have one.
+  // The accused's headshot is the head of their accused picture.
   if (turn.kind === "charge") return faced("charge", "accusing", turn.against, a => cutout(a, framed(a, "accused", `${b.i}:${a}`)));
   if (turn.kind === "examination") return faced("examination", "grave", turn.bodies || [], cutout);
   const p = panel("bow", b.day);

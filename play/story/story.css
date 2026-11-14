@@ -97,7 +97,8 @@
 /* A charge: the accused's headshot at the left, the accuser pointing at it
    from the right, so the arm points toward the accused; the words are in
    the text under it. */
-.panel.charge .head { filter: brightness(0.9); }
+/* An accused picture is a cut-out, so its headshot gets a ground of its own. */
+.panel.charge .head { filter: brightness(0.9); background-color: #1c1612; }
 .panel.charge .fig { right: 14%; top: 1%; }
 #log > .entry.charge { text-align: center; margin-top: -0.2em; }
 #log > .entry.charge .who { margin-bottom: 0.15em; }

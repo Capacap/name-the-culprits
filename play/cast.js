@@ -16,11 +16,12 @@ import {ART, STORY} from "./shared.js";
 const GUESTS = ["alice", "bram", "cora", "dana", "emil", "fay", "gale", "hana", "iver", "juno", "kirk", "lena"];
 const OWN = new Set(GUESTS);
 // The moods a guest has pictures of, and how many of each, drawn as
-// art/drawn/hand/<who>@<mood>-<n> (n from 1): "accusing" for a charge,
-// "grave" for an examination, "accused" for the headshot under a charge. A
-// mood a guest's set shows (SETS) is not listed, so every picture listed is
-// one the game shows. deploy/build.py reads this object as JSON, so it stays JSON.
-export const MOODS = {};
+// art/drawn/hand/<who>@<mood>-<n> (n from 1). "accused" is the guest as
+// someone charges them: the whole figure cut out, with no background, of
+// which a charge shows the head (ACCUSED). A mood a guest's set shows (SETS)
+// is not listed, so every picture listed is one the game shows.
+// deploy/build.py reads this object as JSON, so it stays JSON.
+export const MOODS = {"ada": {"accused": 1}, "anselme": {"accused": 1}, "clementine": {"accused": 1}, "henrietta": {"accused": 1}, "ilya": {"accused": 1}, "lucian": {"accused": 1}, "ottilie": {"accused": 1}, "philippa": {"accused": 1}, "robin": {"accused": 1}, "sterling": {"accused": 1}, "terry": {"accused": 1}, "valentin": {"accused": 1}, "winnie": {"accused": 1}};
 // Where each guest's head is in their 1024x1536 portrait, set by eye: the
 // centre and side of a square around it, which cuts the dock icon
 // and the headshot of an accused or dead guest, and the
@@ -35,6 +36,10 @@ export const MOODS = {};
 // one of their own. The tool that cuts the icons reads this object as JSON,
 // so it stays JSON.
 export const HEADS = {"ada": [512, 315, 440, 100], "anselme": [520, 400, 560, 114], "clementine": [512, 330, 680, 140], "henrietta": [490, 270, 700, 90], "ilya": [520, 370, 420, 79], "lucian": [450, 310, 420, 78], "ottilie": [480, 300, 520, 85], "philippa": [500, 330, 500, 95], "robin": [360, 360, 420, 80], "sterling": [500, 240, 420, 78], "terry": [430, 410, 560, 99], "valentin": [523, 440, 500, 97], "winnie": [480, 290, 460, 84], "narrator": [512, 330, 440, 111]};
+// Where each guest's head is in their accused picture, as in HEADS: the
+// centre and side of the square a charge shows. A picture redrawn needs
+// its line looked at again.
+export const ACCUSED = {"ada": [519, 240, 440], "anselme": [489, 225, 440], "clementine": [468, 255, 460], "henrietta": [470, 230, 620], "ilya": [493, 275, 440], "lucian": [520, 200, 440], "ottilie": [491, 215, 460], "philippa": [538, 240, 440], "robin": [494, 245, 440], "sterling": [525, 215, 440], "terry": [455, 220, 500], "valentin": [441, 240, 440], "winnie": [448, 250, 460]};
 const FACE_REF = 100;
 // The placeholder guests' closeups (OWN) all have the head in one place.
 const OWN_HEAD = [512, 360, 680, 100];
@@ -43,8 +48,8 @@ export const zoom = who => `--zoom: ${(FACE_REF / (HEADS[who] || OWN_HEAD)[3]).t
 // The style of a headshot cut from a picture framed like the portrait
 // (story.css .head), the square kept inside the picture as the icon
 // cutter keeps it, so the icon and the headshot show one crop.
-export function head(who) {
-  let [cx, cy, side] = HEADS[who] || OWN_HEAD;
+export function head(who, mood) {
+  let [cx, cy, side] = mood === "accused" && ACCUSED[who] || HEADS[who] || OWN_HEAD;
   cx = Math.min(Math.max(cx, side / 2), 1024 - side / 2);
   cy = Math.min(Math.max(cy, side / 2), 1536 - side / 2);
   return `--hx: ${cx}; --hy: ${cy}; --hside: ${side}`;

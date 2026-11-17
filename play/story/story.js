@@ -4,17 +4,21 @@
 //   A day opens on a wide panel of the house, the rooms where the bodies lay
 //     marked, Veronique presenting it.
 //   An account is a wide panel of the speaker alone, on alternating sides
-//     (a guest with a set of places stands at the left of theirs),
-//     under it the house lit with the way the account walks that day, then
-//     their words. The map is the same on every screen and covers no art.
+//     (a guest with a set of places stands at the left of theirs), at its
+//     foot the house lit with the way the account walks that day, and
+//     their words under it. A map's rooms are one size in every house and
+//     on every screen (ROOM), so its names are; it lies over the place and
+//     off the speaker's face.
 //     Beside the speaker's name stand the player's marks for them.
-//   An examination is a wide panel: the examiner grave, the dead a grey
-//     headshot beside them.
-//   A charge is a wide panel, the accused's headshot and the accuser
-//     pointing at it, its words in the text under it; only it shakes.
-//   Every figure is zoomed so the cast's heads come out one size. The account that
-//     follows a charge stands named under its panel; after an
-//     examination it is a panel of its own.
+//   An examination is a wide panel: the examiner grave, the dead grey
+//     figures beside them, fading out downward.
+//   A charge is a wide panel: the accused at the left, dimmed, as their
+//     accused picture, the accuser at the right; only it shakes. The
+//     accuser's account follows the charge's line under one name, and its
+//     map lies at the panel's foot over the accused.
+//   Every figure is zoomed so the cast's heads come out one size. After an
+//     examination an account is a panel of its own.
+//   A character without a set has headshots in place of those figures.
 //   Every text is one width, the column's, and every panel one height but
 //     for a guest's set, which is taller.
 //   A guest with a set (cast.js SETS) stands cut out over a place of their
@@ -31,7 +35,13 @@
 // Every figure is --frame tall (story.css) before its guest's zoom.
 
 import {reader, story, names, mark, el, svg, dayInView, deathMap, found, accountMap} from "../reader.js";
-import {framed, cutout, preload, head, zoom, stand as placed, stage} from "../cast.js";
+import {framed, cutout, preload, head, zoom, stand as placed, stage, set} from "../cast.js";
+// Where the guests a wide panel is about stand, in percent across it, by how many they are.
+const GHOSTS = {1: [20], 2: [12, 34], 3: [9, 25, 41]};
+// How wide a room's cell of an account's map is, in px, in every house and
+// on every screen (the user, 17 November 2026); the map's own cell is 150.
+const ROOM = 60;
+const routeMap = (turn, day) => { const map = accountMap(turn, day); map.style.width = `${map.viewBox.baseVal.width * ROOM / 150}px`; return map; };
 import {tools} from "../player/tools.js";
 import {context} from "../player/context.js";
 import {mount as workspace} from "../player/workspace.js";
@@ -79,7 +89,8 @@ function row(b) {
   const body = el("div", {class: "body"});
   log.insertBefore(p, b.entry);
   body.append(b.entry);
-  p.append(pn, accountMap(b.turn, b.day), body);
+  pn.append(routeMap(b.turn, b.day));
+  p.append(pn, body);
   marks(b.entry, b.turn, b.day);
   blocks.push(p);
   return {block: p, col: body};
@@ -95,12 +106,24 @@ function wide(b) {
   const faced = (kind, mood, ids, src) => {
     const p = panel(kind, b.day);
     const behind = el("div", {class: "behind"});
-    for (const id of ids) behind.append(headshot(id, src(id), kind === "charge" ? "accused" : ""));
-    p.append(behind);
+    const shot = id => behind.append(headshot(id, src(id), kind === "charge" ? "accused" : ""));
     stand(p, who, mood, b.i);
+    const place = p.querySelector(".place");
+    ids.forEach((id, n) => {
+      const at = (GHOSTS[ids.length] || GHOSTS[3])[n] ?? 41;
+      // The accused stand as their accused picture, a whole figure 2:3, the
+      // dead as their account's figure; one with no such figure, or beside
+      // a speaker with no set, is a headshot.
+      const g = place && (kind === "charge" ? {figure: src(id), style: `${head(id, "accused")}; --wide: ${at}; --narrow: ${at}`} : set(id, "neutral", at));
+      if (!g) return shot(id);
+      const i = new Image();
+      i.className = `cut ghost${kind === "charge" ? " tall" : ""}`; i.alt = ""; i.src = g.figure; i.style.cssText = g.style;
+      place.querySelector("img.cut").before(i);
+    });
+    if (behind.children.length) p.prepend(behind);
+    if (place) p.classList.add("ghosts");
     return p;
   };
-  // The accused's headshot is the head of their accused picture.
   if (turn.kind === "charge") return faced("charge", "accusing", turn.against, a => cutout(a, framed(a, "accused", `${b.i}:${a}`)));
   if (turn.kind === "examination") return faced("examination", "grave", turn.bodies || [], cutout);
   const p = panel("bow", b.day);
@@ -157,15 +180,20 @@ const r = reader({
     if (last) { last.col.append(entry); aimed.push(last.block || entry); return; }
     aimed.push(entry);
     if (turn.kind !== "account") return;
-    entry.prepend(el("div", {class: "who"}, el("span", {class: "speaker", "data-id": turn.speaker}, names[turn.speaker])));
-    // An account that answers a charge has no panel of its own; its map
-    // stands over its words, under the charge.
+    if (!answer) entry.prepend(el("div", {class: "who"}, el("span", {class: "speaker", "data-id": turn.speaker}, names[turn.speaker])));
+    // An accuser's account has no panel of its own: it follows the charge's
+    // line under the charge's name, where its marks stand, and its map
+    // lies at the foot of the charge's panel, or over its words where the
+    // accuser has no set.
     if (answer) {
       entry.classList.add("answer");
-      const map = accountMap(turn, beat.day);
-      map.classList.add("answer");
-      entry.before(map);
-      marks(entry, turn, beat.day);
+      const p = beat.anchor;
+      if (beat.answered) return;
+      beat.answered = true;
+      marks(beat.entry, turn, beat.day);
+      const map = routeMap(turn, beat.day);
+      if (p.querySelector(".place")) p.append(map);
+      else { map.classList.add("answer"); entry.before(map); }
       aimed.push(map);
       return;
     }

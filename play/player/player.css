@@ -47,13 +47,15 @@ img.head[src*="/icon/"] { object-position: 50% 50%; }
 /* The player's marks beside an account's speaker: cleared and suspect for
    the day, culprit, set apart, for the whole story. Green is cleared, bone
    suspect and gold culprit; red stays the truth's. */
-.marks { display: inline-flex; gap: 0.35em; margin-left: 0.9em; vertical-align: 1px; }
+.marks { display: inline-flex; gap: 0.35em; margin-left: 0.9em; vertical-align: 2px; opacity: 0.85; }
 .mk { font: 600 10.5px "Cinzel", serif; letter-spacing: 0.1em; text-transform: uppercase; padding: 0.15em 0.6em; cursor: pointer; color: var(--dim); background: none; border: 1px solid #4a3b2a; }
+/* Beside a name they are smaller and dimmer than it, so the words lead. */
+.marks .mk { font-size: 9px; padding: 0.1em 0.5em; color: #6f6252; border-color: #2c241b; }
 .mk.culprit { margin-left: 0.9em; }
 .mk.suspect.on { color: var(--ink); background: var(--bone); border-color: var(--bone); }
 .mk.cleared.on { color: #120d0a; background: #8fae8c; border-color: #8fae8c; }
 .mk.culprit.on { color: #120d0a; background: var(--gold); border-color: var(--gold); }
-@media (max-width: 699px) { .marks { margin-left: 0.7em; } .mk { padding: 0.3em 0.6em; } }
+@media (max-width: 699px) { .marks { margin-left: 0.7em; } .marks .mk { padding: 0.3em 0.55em; } }
 /* The marks as a table over her challenge: a column for each guest, a row
    for each day. On a narrow screen a cell holds the mark's first letter. */
 .marktable { margin: 1.6em auto 1.2em; }

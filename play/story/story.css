@@ -63,10 +63,14 @@
 .solo .fig.a { left: 36%; translate: -50% 0; }
 .solo .fig.b { left: 64%; translate: -50% 0; }
 .solo > .body { width: var(--col); margin: 0 auto; padding: 0; }
-/* The account's map, centred under the art at one width on every screen. */
-.solo > .map, #log > .map.answer { width: min(440px, 100% - 1.6rem); margin: -0.2em auto 1em; transition: filter 0.6s; }
-#log > .map.answer { margin-top: 0.8em; }
-.pair.past > .map { filter: brightness(0.6) saturate(0.7); }
+/* An account's map lies at its panel's foot, over the place: at the right
+   in an account, whose speaker stands at the left, and at the left in a
+   charge, over the accused. Its width is set by its rooms (story.js ROOM). */
+.panel > .map { position: absolute; z-index: 2; bottom: 6%; filter: drop-shadow(0 4px 12px #000); }
+.solo > .panel > .map { right: 4%; }
+.panel.charge > .map { left: 4%; }
+/* The map of an accuser without a set stands over their words. */
+#log > .map.answer { margin: 0.8em auto 1em; }
 .pair .entry { margin-bottom: 0.6em; }
 
 /* A day opens on the house, where the bodies lay marked, Veronique beside. */
@@ -93,16 +97,26 @@
 /* Three bodies: smaller again, so the third stands clear of the examiner. */
 .panel.examination:has(.head + .head + .head) .head { --hs: calc(var(--frame) * 0.56 * 0.42); }
 
-/* A charge: the accused's headshot at the left, the accuser pointing at it
-   from the right, so the arm points toward the accused; the words are in
-   the text under it. */
+/* A charge: the accused at the left, the accuser pointing at them from the
+   right; its line opens the accuser's words under it. The guests a charge
+   or an examination is about stand as cut-out figures (img.cut.ghost) over
+   the speaker's place, dimmed and fading out downward: the dead as their
+   account's figure in grey, the accused as their accused picture, a whole
+   figure 2:3 placed by its head (--hx, --hy, --hside) at the speaker's
+   scale. Headshots (.behind) stand in for them where the speaker has no set. */
+.place img.cut.ghost { z-index: 0; filter: grayscale(0.9) brightness(0.55) contrast(0.9); opacity: 0.9;
+  mask-image: linear-gradient(to bottom, #000 30%, transparent 78%); }
+.panel.charge .place img.cut.ghost { filter: grayscale(0.55) brightness(0.6); }
+.place img.cut.ghost.tall { --h: calc(max(100cqh, 66.667cqw) * 470 / var(--hside)); height: var(--h); width: calc(var(--h) * 2 / 3);
+  top: calc(6cqh - (var(--hy) - var(--hside) / 2) / 1536 * var(--h)); left: calc(var(--at) * 1cqw - var(--hx) / 1536 * var(--h));
+  mask-image: linear-gradient(to bottom, #000 26%, transparent 62%); }
 /* An accused picture is a cut-out, so its headshot gets a ground of its own. */
 .panel.charge .head { filter: brightness(0.9); background-color: #1c1612; }
 .panel.charge .fig { right: 14%; top: 1%; }
-#log > .entry.charge { text-align: center; margin-top: -0.2em; }
+#log > .entry.charge { margin-top: -0.2em; margin-bottom: 0.3em; }
 #log > .entry.charge .who { margin-bottom: 0.15em; }
 
-#log > .entry.answer { margin-top: 0.8em; margin-bottom: 1.6em; }
+#log > .entry.answer { margin-top: 0; margin-bottom: 1.6em; }
 /* A defence that ends an account answering a charge stays close to it. */
 #log > .entry.answer:has(+ .entry.defence) { margin-bottom: 0; }
 #log > .entry.answer + .entry.defence { margin-bottom: 1.6em; }
@@ -119,9 +133,15 @@
   #log .panel.house { height: auto; min-height: calc(var(--frame) * 0.56); padding: 0.8em 0 0.6em; }
   .panel.house .lay { position: relative; left: auto; top: auto; translate: none; width: 92%; margin: 0 auto; }
   .panel.house .place { display: none; }
+  .solo > .panel > .map { right: 2%; bottom: 4%; }
+  .panel.charge > .map { left: 2%; bottom: 4%; }
+  /* The speaker stands clear of the map, and of the guests beside them. */
+  .solo .place img.cut { --at: 21; }
+  .panel.ghosts .place img.cut:not(.ghost) { --at: 74; }
   /* On a phone two headshots stack at the left, smaller. */
   .panel.examination:has(.head + .head) .behind { flex-direction: column; justify-content: center; align-items: flex-start; gap: 3%; }
   .panel.examination:has(.head + .head) .head { --hs: calc(var(--frame) * 0.56 * 0.42); }
   .panel.examination:has(.head + .head + .head) .head { --hs: calc(var(--frame) * 0.56 * 0.36); }
   #log .entry.narrator .slotsign { position: static; width: auto; vertical-align: -1px; margin-right: 0.3em; }
 }
+

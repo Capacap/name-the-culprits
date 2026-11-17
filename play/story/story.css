@@ -135,10 +135,12 @@
 @media (max-width: 699px) {
   :root { --col: calc(100% - 1.6rem); --wide: 100%; --logwide: 100cqw; --frame: min(86vw, 52vh); }
   /* The house is laid out in flow and may hold a rule's pictures under the
-     map, so it grows from the panels' height. */
-  #log .panel.house { height: auto; min-height: calc(var(--frame) * 0.56); padding: 0.8em 0 0.6em; }
+     map, so it grows from the panels' height. Veronique stands in the
+     middle behind the map, which covers her from the shoulders down. */
+  #log .panel.house { height: auto; min-height: calc(var(--frame) * 0.56); padding: calc(var(--frame) * 0.3) 0 0.6em; }
   .panel.house .lay { position: relative; left: auto; top: auto; translate: none; width: 92%; margin: 0 auto; }
-  .panel.house .place { display: none; }
+  .panel.house .place img.cut { --at: 50; }
+  .panel.house .caption { text-shadow: 0 0 4px #000, 0 0 10px #000, 0 0 16px #000; }
   .solo > .panel > .map { right: 2%; bottom: 4%; }
   .panel.charge > .map { left: 2%; bottom: 4%; }
   /* The speaker stands clear of the map, and of the guests beside them. */

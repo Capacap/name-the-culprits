@@ -104,7 +104,8 @@ textarea.page { display: block; width: 100%; margin-top: 0.4em; padding: 0.4em 0
 .herpanel { margin: 1.2em 0 0; text-align: left; }
 .herpanel .entry.answer { margin: 0 0 0.6em; }
 .herpanel .call { font-weight: 700; }
-.herpanel .panel { height: calc(var(--frame) * 0.56); margin: 0 0 0.8em; }
+/* Her picture is as wide as the story's panels, centred on the column. */
+.herpanel .panel { height: calc(var(--frame) * 0.56); width: var(--logwide); margin: 0 0 0.8em calc((100% - var(--logwide)) / 2); }
 .herpanel.right .call { color: var(--gold); }
 .herpanel .entry .line + .line { margin-top: 0.8em; }
 .herpanel .entry .line.quote + .line.quote { margin-top: 0.2em; }

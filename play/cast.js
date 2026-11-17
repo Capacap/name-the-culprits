@@ -3,13 +3,14 @@
 // portrait in art/drawn/hand, shown for every mood they have neither a set
 // nor a picture of and as the headshot of an accused or dead guest, and a
 // head cut from it for the icons. A guest in MOODS has pictures of those
-// moods too. Veronique (narrator) has hers, at work with her eyes on her
-// sewing, and the same picture in two moods (HER): looking up at the player
-// on the story's last day and smiling at a team seen through. The twelve
+// moods too. The twelve
 // placeholder guests the stories named before 6 November 2026 (OWN) keep
 // their own framed figures and cut-out closeups. A mood a character lacks falls back to their first.
 // A guest in SETS speaks in a place of their own instead: the place (a plate)
 // and the guest cut out over it (a figure), one pair per mood, in art/drawn/set.
+// Veronique (narrator) has a set and no other picture: three stages of her
+// work with a thread, by the days a story has left (stage), and her smile at
+// a team seen through, all over one plate (PLATE).
 
 import {ART, STORY} from "./shared.js";
 
@@ -62,7 +63,7 @@ export function head(who, mood) {
 // plate, the same canvas, <who>@<mood>-plate. A figure redrawn needs its
 // line measured again. deploy/build.py reads this object as JSON, so it
 // stays JSON.
-export const SETS = {"ada": {"neutral": [25, 150, 28], "accusing": [76, 165, 13], "grave": [75, 168, 44]}, "anselme": {"neutral": [27, 193, 19], "accusing": [67, 206, 20], "grave": [67, 205, 12]}, "clementine": {"neutral": [21, 174, 11], "accusing": [77, 172, 11], "grave": [79, 163, 23]}, "henrietta": {"neutral": [31, 183, 25], "accusing": [68, 203, 18], "grave": [71, 193, 10]}, "ilya": {"neutral": [24, 200, 13], "accusing": [69, 201, 21], "grave": [70, 165, 21]}, "lucian": {"neutral": [28, 195, 20], "accusing": [68, 178, 29], "grave": [70, 166, 40]}, "ottilie": {"neutral": [29, 220, 13, 35], "accusing": [71, 179, 28], "grave": [70, 177, 59]}, "philippa": {"neutral": [32, 204, 10], "accusing": [67, 214, 39], "grave": [68, 177, 16]}, "robin": {"neutral": [25, 179, 32], "accusing": [68, 200, 60], "grave": [66, 184, 19]}, "sterling": {"neutral": [29, 194, 23], "accusing": [70, 200, 34], "grave": [67, 175, 43]}, "terry": {"neutral": [28, 193, 16], "accusing": [64, 205, 40], "grave": [65, 165, 35]}, "valentin": {"neutral": [27, 209, 9], "accusing": [64, 211, 26], "grave": [64, 191, 21]}, "winnie": {"neutral": [29, 210, 27], "accusing": [69, 204, 39], "grave": [68, 174, 32]}};
+export const SETS = {"ada": {"neutral": [25, 150, 28], "accusing": [76, 165, 13], "grave": [75, 168, 44]}, "anselme": {"neutral": [27, 193, 19], "accusing": [67, 206, 20], "grave": [67, 205, 12]}, "clementine": {"neutral": [21, 174, 11], "accusing": [77, 172, 11], "grave": [79, 163, 23]}, "henrietta": {"neutral": [31, 183, 25], "accusing": [68, 203, 18], "grave": [71, 193, 10]}, "ilya": {"neutral": [24, 200, 13], "accusing": [69, 201, 21], "grave": [70, 165, 21]}, "lucian": {"neutral": [28, 195, 20], "accusing": [68, 178, 29], "grave": [70, 166, 40]}, "ottilie": {"neutral": [29, 220, 13, 35], "accusing": [71, 179, 28], "grave": [70, 177, 59]}, "philippa": {"neutral": [32, 204, 10], "accusing": [67, 214, 39], "grave": [68, 177, 16]}, "robin": {"neutral": [25, 179, 32], "accusing": [68, 200, 60], "grave": [66, 184, 19]}, "sterling": {"neutral": [29, 194, 23], "accusing": [70, 200, 34], "grave": [67, 175, 43]}, "terry": {"neutral": [28, 193, 16], "accusing": [64, 205, 40], "grave": [65, 165, 35]}, "valentin": {"neutral": [27, 209, 9], "accusing": [64, 211, 26], "grave": [64, 191, 21]}, "winnie": {"neutral": [29, 210, 27], "accusing": [69, 204, 39], "grave": [68, 174, 32]}, "narrator": {"taut": [50, 200, 24], "lowered": [50, 200, 23], "look": [50, 200, 20], "smile": [50, 200, 21]}};
 // Every figure of a set is scaled so its face is this many rows of the
 // plate's 1024 tall, and its hair's top stands this many percent of the
 // panel's height under the panel's top (story.css .place).
@@ -70,17 +71,43 @@ const SET_FACE = 200, SET_HEADROOM = 6;
 // On a narrow panel the face stands this far across: an account's figure
 // at the left, a charge's and an examination's at the right.
 const SET_NARROW = {neutral: 38, accusing: 64, grave: 64};
-// A guest's set for a mood, or nothing: the plate, the figure and the
-// style that places each (story.css .place).
-export function set(who, mood) {
+// A character whose every mood stands over one plate, and the mood it is
+// filed under. deploy/build.py reads this object as JSON, so it stays JSON.
+export const PLATE = {"narrator": "taut"};
+// Veronique's mood on a day of a story of so many days: every story ends
+// with her eyes on the reader, the day before with her thread lowered, and
+// the day before that with it taut.
+export const stage = (day, days) => ["look", "lowered", "taut"][Math.min(days - day, 2)];
+// A character's set for a mood, or nothing: the plate, the figure and the
+// style that places each (story.css .place). at puts the face that many
+// percent across the panel at every width, in place of the set's own places.
+export function set(who, mood, at) {
   const s = SETS[who]?.[mood];
   if (!s) return null;
   const [face, tall, hair, wide = face] = s;
   return {
-    plate: `${ART}/set/${who}@${mood}-plate.png`, at: `background-position: ${face}% 0`,
+    plate: `${ART}/set/${who}@${PLATE[who] || mood}-plate.png`, at: `background-position: ${face}% 0`,
     figure: `${ART}/set/${who}@${mood}.png`,
-    style: `--face: ${face / 100}; --wide: ${wide}; --narrow: ${SET_NARROW[mood]}; --s: ${(SET_FACE / tall).toFixed(3)}; --hair: ${(hair / 1024).toFixed(4)}; --head: ${SET_HEADROOM}`,
+    style: `--face: ${face / 100}; --wide: ${at ?? wide}; --narrow: ${at ?? SET_NARROW[mood] ?? face}; --s: ${(SET_FACE / tall).toFixed(3)}; --hair: ${(hair / 1024).toFixed(4)}; --head: ${SET_HEADROOM}`,
   };
+}
+// Stand a character in a panel over their own place, where they have a set
+// for the mood (story.css .place); says whether they have.
+export function stand(p, who, mood, at) {
+  const s = set(who, mood, at);
+  if (!s) return false;
+  const place = document.createElement("div"), plate = document.createElement("div"), figure = new Image();
+  place.className = "place";
+  plate.className = "plate";
+  plate.style.cssText = `background-image: url("${s.plate}"); ${s.at}`;
+  figure.className = "cut";
+  figure.alt = "";
+  figure.src = s.figure;
+  figure.style.cssText = s.style;
+  place.append(plate, figure);
+  p.classList.add("set");
+  p.prepend(place);
+  return true;
 }
 const portrait = who => `${ART}/hand/${who}.png`;
 // Which of a mood's n pictures a turn shows, the same on every reading of
@@ -90,8 +117,6 @@ function pick(key, n) {
   for (const c of `${STORY}:${key}`) h = Math.imul(h ^ c.charCodeAt(0), 16777619);
   return (h >>> 0) % n + 1;
 }
-export const HER = ["lookup", "smile"];
-
 // The picture a headshot is cut from: a placeholder guest's closeup (the
 // head at OWN_HEAD), otherwise the picture given or the portrait.
 export const cutout = (who, src) => OWN.has(who) ? `${ART}/closeup-cut/${who}.png` : src || portrait(who);
@@ -103,7 +128,6 @@ export const icon = who => `${ART}/icon/${who}.png`;
 const FRAMED = ["neutral", "accusing", "accused", "shocked"];
 // A character in a mood, for the turn named by key.
 export function framed(who, mood, key = "") {
-  if (who === "narrator" && HER.includes(mood)) return `${ART}/hand/narrator@${mood}.png`;
   if (OWN.has(who)) {
     const own = mood === "grave" ? "shocked" : mood;
     return `${ART}/frame/${who}@${FRAMED.includes(own) ? own : FRAMED[0]}.png`;
@@ -117,8 +141,7 @@ export function framed(who, mood, key = "") {
 export function preload(guests) {
   for (const who of [...guests, "narrator"]) {
     if (!OWN.has(who)) {
-      new Image().src = portrait(who);
-      if (who === "narrator") for (const m of HER) new Image().src = framed(who, m);
+      if (who !== "narrator") new Image().src = portrait(who);
       for (const [m, n] of Object.entries(MOODS[who] || {}))
         for (let i = 1; i <= n; i++) new Image().src = `${ART}/hand/${who}@${m}-${i}.png`;
       for (const m of Object.keys(SETS[who] || {})) { const s = set(who, m); new Image().src = s.plate; new Image().src = s.figure; }

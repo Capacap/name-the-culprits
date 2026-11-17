@@ -72,8 +72,6 @@
 .panel.house .lay { position: absolute; z-index: 1; left: 4%; top: 50%; translate: 0 -50%; width: 66%; }
 .panel.house .map { width: 100%; filter: drop-shadow(0 4px 12px #000); }
 .panel.house .caption { position: static; margin-top: 0.6em; text-align: center; color: var(--red); }
-.panel.house .fig { right: 3%; top: 2%; }
-.panel.bow .fig { left: 50%; top: 2%; translate: -50% 0; }
 
 /* An examination: the dead as a grey headshot at the left, the examiner
    grave at the right. A headshot is the square around a head in a picture
@@ -119,7 +117,7 @@
      map, so it grows from the panels' height. */
   #log .panel.house { height: auto; min-height: calc(var(--frame) * 0.56); padding: 0.8em 0 0.6em; }
   .panel.house .lay { position: relative; left: auto; top: auto; translate: none; width: 92%; margin: 0 auto; }
-  .panel.house .fig { display: none; }
+  .panel.house .place { display: none; }
   /* On a phone two headshots stack at the left, smaller. */
   .panel.examination:has(.head + .head) .behind { flex-direction: column; justify-content: center; align-items: flex-start; gap: 3%; }
   .panel.examination:has(.head + .head) .head { --hs: calc(var(--frame) * 0.56 * 0.42); }

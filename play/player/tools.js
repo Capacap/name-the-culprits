@@ -6,7 +6,7 @@
 // The answer file is fetched once the team is named or the truth opened:
 // her word on the teams that came closest, then the truth itself.
 
-import {cutout, icon, framed, zoom} from "../cast.js";
+import {cutout, icon, stand} from "../cast.js";
 import {STORY} from "../shared.js";
 import {record, guess, reveal, finished} from "../progress.js";
 import {forget} from "./save.js";
@@ -235,12 +235,12 @@ export function tools(ctx) {
   const loaded = () => Promise.all(loading);
   function panel(team, how) {
     const box = el("div", {class: `herpanel ${how}`});
-    // She smiles at a team seen through, framed as the story's panels frame
-    // her (story.css .panel.bow: the top of the figure, faded at the sides).
+    // She smiles at a team seen through, over her own place as in the
+    // story's panels (story.css .place).
     if (how === "right") {
-      const her = el("img", {class: "fig", src: framed("narrator", "smile"), alt: ""});
-      her.style.cssText = zoom("narrator");
-      box.append(el("figure", {class: "panel bow"}, her));
+      const her = el("figure", {class: "panel bow"});
+      stand(her, "narrator", "smile");
+      box.append(her);
     }
     const title = team ? el("span", {class: "line call"}, how === "right" ? "You saw through it!"
       : `${listOf(team)} ${team.length > 1 ? "are" : "is"} not the team.`) : null;

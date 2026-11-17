@@ -31,7 +31,7 @@
 // Every figure is --frame tall (story.css) before its guest's zoom.
 
 import {reader, story, names, mark, el, svg, dayInView, deathMap, found, accountMap} from "../reader.js";
-import {framed, cutout, preload, head, zoom, set} from "../cast.js";
+import {framed, cutout, preload, head, zoom, stand as placed, stage} from "../cast.js";
 import {tools} from "../player/tools.js";
 import {context} from "../player/context.js";
 import {mount as workspace} from "../player/workspace.js";
@@ -46,12 +46,7 @@ const fig = (who, mood, key, cls = "fig") => { const i = img(framed(who, mood, k
 // The speaker in a panel: over their own place where they have a set for
 // the mood (cast.js set, story.css .place), otherwise their figure.
 function stand(p, who, mood, key, cls) {
-  const s = set(who, mood);
-  if (!s) return p.append(fig(who, mood, key, cls));
-  const figure = img(s.figure, "cut");
-  figure.style.cssText = s.style;
-  p.classList.add("set");
-  p.prepend(el("div", {class: "place"}, el("div", {class: "plate", style: `background-image: url("${s.plate}"); ${s.at}`}), figure));
+  if (!placed(p, who, mood)) p.append(fig(who, mood, key, cls));
 }
 // A character's headshot, the square around their head in the picture given (story.css .head).
 const headshot = (who, src, mood) => el("div", {class: "head", style: `${head(who, mood)}; background-image: url("${src}")`});
@@ -62,6 +57,8 @@ function panel(kind, day) {
 }
 const shown = p => requestAnimationFrame(() => requestAnimationFrame(() => p.classList.remove("new")));
 
+// How far across the house's panel Veronique's face stands, beside the map.
+const HOUSE_HER = 84;
 let side = 0, last = null;    // last: where a turn that continues the latest account goes
 let fresh = null;             // the block the last step added, to bring into view
 const aimed = [];             // what the last step added or grew, for the camera
@@ -88,8 +85,8 @@ function row(b) {
   return {block: p, col: body};
 }
 
-// The story's last day, on which Veronique looks up from her work at the player.
-const lastDay = day => day === story.days.length;
+// Veronique at her work, as far along as the day is in the story (cast.js stage).
+const her = (p, day, at) => placed(p, "narrator", stage(day, story.days.length), at);
 
 function wide(b) {
   const {turn} = b, who = turn.speaker;
@@ -107,7 +104,7 @@ function wide(b) {
   if (turn.kind === "charge") return faced("charge", "accusing", turn.against, a => cutout(a, framed(a, "accused", `${b.i}:${a}`)));
   if (turn.kind === "examination") return faced("examination", "grave", turn.bodies || [], cutout);
   const p = panel("bow", b.day);
-  p.append(fig("narrator", lastDay(b.day) ? "lookup" : b.mood, ""));
+  her(p, b.day);
   return p;
 }
 
@@ -185,7 +182,8 @@ const r = reader({
     const cap = el("figcaption", {class: "caption"},
       bodies.length ? `Where ${bodies.map(f => f.who.map(id => names[id]).join(" and ")).join(", ")} ${bodies.length > 1 || bodies[0].who.length > 1 ? "were" : "was"} found` : "The house");
     lay.append(map, cap);
-    p.append(lay, fig("narrator", lastDay(day) ? "lookup" : "doll-presenting", ""));
+    p.append(lay);
+    her(p, day, HOUSE_HER);
     log.insertBefore(p, h.nextSibling);
     deathMap(map, day, true);
     blocks.push(p);

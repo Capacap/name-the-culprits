@@ -39,7 +39,7 @@ ART = "art/drawn"
 # The art the game loads, for the guests the library's stories name (see
 # art_ship): each guest's portrait, their set's plates and figures (cast.js
 # SETS), their mood pictures (cast.js MOODS) and
-# their dock head, and Veronique's portrait, her two moods (cast.js HER) and
+# their dock head, and Veronique's set and
 # her head. The placeholder guests' framed
 # figures and faces (cast.js OWN) are not shipped, since no story in the
 # library names them.
@@ -187,15 +187,17 @@ def art_ship(kept):
     with open(os.path.join(ROOT, "play", "cast.js")) as fh:
         cast_js = fh.read()
     const = lambda name: json.loads(re.search(r"^export const %s = (.*?);$" % name, cast_js, re.M | re.S).group(1))
-    moods, heads, her, sets = const("MOODS"), const("HEADS"), const("HER"), const("SETS")
+    moods, heads, sets, shared = const("MOODS"), const("HEADS"), const("SETS"), const("PLATE")
     # A guest the view would show at the placeholder's crop and zoom (cast.js
     # OWN_HEAD) never ships: every guest a story names has a HEADS line.
     unplaced = [g for g in guests if g not in heads]
     if unplaced:
         sys.exit("no HEADS line in play/cast.js for %s" % ", ".join(unplaced))
     pictures = ["%s@%s-%d" % (g, m, i) for g in guests for m, n in sorted(moods.get(g, {}).items()) for i in range(1, n + 1)]
-    places = ["%s@%s%s" % (g, m, part) for g in guests for m in sorted(sets.get(g, {})) for part in ("", "-plate")]
-    return {"hand": guests + pictures + ["narrator"] + ["narrator@%s" % m for m in her], "icon": guests + ["narrator"], "set": places}
+    # A character whose moods share one plate (cast.js PLATE) ships it once.
+    places = ["%s@%s%s" % (g, m, part) for g in guests + ["narrator"] for m in sorted(sets.get(g, {}))
+              for part in ("", "-plate") if not part or shared.get(g, m) == m]
+    return {"hand": guests + pictures, "icon": guests + ["narrator"], "set": places}
 
 
 def main():

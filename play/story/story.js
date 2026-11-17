@@ -6,9 +6,9 @@
 //   An account is a wide panel of the speaker alone, on alternating sides
 //     (a guest with a set of places stands at the left of theirs), at its
 //     foot the house lit with the way the account walks that day, and
-//     their words under it. A map's rooms are one size in every house and
-//     on every screen (ROOM), so its names are; it lies over the place and
-//     off the speaker's face.
+//     their words under it. A map's rooms are one size in every house, a
+//     size that grows with the screen (story.css --room), so its names
+//     are; it lies over the place and off the speaker's face.
 //     Beside the speaker's name stand the player's marks for them.
 //   An examination is a wide panel: the examiner grave, the dead grey
 //     figures beside them, fading out downward.
@@ -38,10 +38,9 @@ import {reader, story, names, mark, el, svg, dayInView, deathMap, found, account
 import {framed, cutout, preload, head, zoom, stand as placed, stage, set} from "../cast.js";
 // Where the guests a wide panel is about stand, in percent across it, by how many they are.
 const GHOSTS = {1: [20], 2: [12, 34], 3: [9, 25, 41]};
-// How wide a room's cell of an account's map is, in px, in every house and
-// on every screen (the user, 17 November 2026); the map's own cell is 150.
-const ROOM = 60;
-const routeMap = (turn, day) => { const map = accountMap(turn, day); map.style.width = `${map.viewBox.baseVal.width * ROOM / 150}px`; return map; };
+// An account's map, with how many rooms wide it is (its own cell is 150),
+// which story.css multiplies by the screen's room size (--room).
+const routeMap = (turn, day) => { const map = accountMap(turn, day); map.style.setProperty("--cols", map.viewBox.baseVal.width / 150); return map; };
 import {tools} from "../player/tools.js";
 import {context} from "../player/context.js";
 import {mount as workspace} from "../player/workspace.js";

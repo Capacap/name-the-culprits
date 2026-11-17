@@ -65,7 +65,13 @@
 .solo > .body { width: var(--col); margin: 0 auto; padding: 0; }
 /* An account's map lies at its panel's foot, over the place: at the right
    in an account, whose speaker stands at the left, and at the left in a
-   charge, over the accused. Its width is set by its rooms (story.js ROOM). */
+   charge, over the accused. */
+/* A room of an account's map is one width in every house: an eighth of the
+   figures' height where the panel is wide enough, never under 60px, where
+   its names stop being readable, but for a panel too narrow for five such
+   rooms. The percentages are of the panel's width. */
+.map { --room: min(18.5%, max(60px, min(8.4%, var(--frame) * 0.125))); }
+.panel > .map, #log > .map.answer { width: calc(var(--cols) * var(--room)); }
 .panel > .map { position: absolute; z-index: 2; bottom: 6%; filter: drop-shadow(0 4px 12px #000); }
 .solo > .panel > .map { right: 4%; }
 .panel.charge > .map { left: 4%; }

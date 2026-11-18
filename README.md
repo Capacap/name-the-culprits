@@ -45,7 +45,7 @@ uv run --with pillow python deploy/build.py [--site https://the.live.site]
 npx wrangler deploy
 ```
 
-The build copies only what the library and the game load, minifies the code without its comments, and converts the pictures to WebP. It needs `stories/` and `art/drawn/`, so it runs on the machine that holds them. With `--site`, the stories the live site holds that the library no longer lists are shipped unlisted, so an old link or a half-read story still opens; a story whose format the game no longer reads is dropped then.
+The build copies only what the library and the game load, minifies the code without its comments, and converts the pictures to WebP. The site's icon (`play/icon.svg`, with `icon-32.png` and `icon-180.png` made from it) and the picture a pasted link shows (`play/card.png`) ship as they are; the page names both in its head, the picture by its whole address at nametheculprits.com. `deploy/card.html` is that picture's source and says how to shoot it again. It needs `stories/` and `art/drawn/`, so it runs on the machine that holds them. With `--site`, the stories the live site holds that the library no longer lists are shipped unlisted, so an old link or a half-read story still opens; a story whose format the game no longer reads is dropped then.
 
 To run the site on this machine, build `dist/`, make the local database and start the dev server, which serves `dist/` and the Worker together:
 

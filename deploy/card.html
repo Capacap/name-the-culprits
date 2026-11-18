@@ -1,0 +1,41 @@
+<!doctype html>
+<!-- The picture a chat or a feed shows for a link to the site, drawn at
+1200 by 630. play/card.png is this page as a headless browser shoots it:
+
+    google-chrome --headless=new --hide-scrollbars --allow-file-access-from-files \
+      --window-size=1200,630 --screenshot=play/card.png deploy/card.html
+
+The house is a golden rectangle cut into its squares, each a room, and the
+thread is the golden spiral through them: a quarter circle in each square,
+with a door in each wall where the thread passes. play/icon.svg is the
+same spiral alone. -->
+<html lang="en"><head><meta charset="utf-8">
+<title>The Loose Threads, the link's picture</title>
+<link rel="stylesheet" href="../play/fonts.css">
+<style>
+html, body { margin: 0; }
+body { position: relative; width: 1200px; height: 630px; overflow: hidden; background: radial-gradient(ellipse at 50% 20%, #2a1a12 0%, #080605 70%); }
+svg { position: absolute; inset: 0; }
+.text { position: absolute; left: 136px; top: 366px; width: 520px; text-align: right; }
+h1 { margin: 0; font: 700 60px/1.05 "Cinzel", serif; letter-spacing: 0.08em; color: #e2493b; }
+p { margin: 14px 0 0; font: italic 22px/1.3 "Libre Caslon Text", Georgia, serif; color: #9b8f7e; }
+</style></head><body>
+<svg viewBox="0 0 1200 630" width="1200" height="630">
+<g fill="none" stroke="#6b5d4c" stroke-width="3" stroke-linecap="square">
+  <path d="M159.6 617.0 L1080.0 617.0 L1080.0 8.0 L112.0 8.0 L112.0 617.0"/>
+  <path d="M707.0 149.8 L707.0 603.0"/>
+  <path d="M707.0 381.0 L987.0 381.0"/>
+  <path d="M844.1 381.0 L844.1 554.1"/>
+  <path d="M737.1 465.8 L844.1 465.8"/>
+  <path d="M791.7 399.7 L791.7 465.8"/>
+  <path d="M791.7 433.4 L832.6 433.4"/>
+  <path d="M811.7 433.4 L811.7 458.7"/>
+  <path d="M796.1 445.8 L811.7 445.8"/>
+</g>
+<g fill="none" stroke="#c4271d" stroke-width="14" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M126.0 660 L126.0 603.0"/>
+  <path d="M126.0 603.0 A581.0 581.0 0 0 1 707.0 22.0 A359.0 359.0 0 0 1 1066.0 381.0 A221.9 221.9 0 0 1 844.1 603.0 A137.1 137.1 0 0 1 707.0 465.8 A84.8 84.8 0 0 1 791.7 381.0 A52.4 52.4 0 0 1 844.1 433.4 A32.4 32.4 0 0 1 811.7 465.8 A20.0 20.0 0 0 1 791.7 445.8"/>
+</g>
+</svg>
+<div class="text"><h1>The Loose Threads</h1><p>A murder mystery in a house of guests.<br>Hear them out, then name the culprits.</p></div>
+</body></html>

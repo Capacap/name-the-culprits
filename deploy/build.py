@@ -1,6 +1,7 @@
 """Build the site's assets into dist/: the one page (play/), which is the
 library or the game, with only the files it loads, comments stripped and
-the pictures as WebP. The font files ship as they are, with their licence.
+the art as WebP. The font files ship as they are, with their licence, and
+so do the site's icon and the picture a pasted link shows.
 
     uv run --with pillow python deploy/build.py [--jobs N] [--site URL]
 
@@ -34,6 +35,11 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DIST = os.path.join(ROOT, "dist")
 PAGES = ["play/index.html"]
 FONT = ".woff2"
+# The pictures a page links itself, which ship as they are, and the one a
+# pasted link shows (deploy/card.html), which the page names by its whole
+# address.
+AS_IS = (".png", ".svg")
+CARD = "play/card.png"
 LICENCE = "play/fonts/OFL.txt"
 ART = "art/drawn"
 # The art the game loads, for the guests the library's stories name (see
@@ -74,9 +80,9 @@ def walk(start):
         if p in seen:
             continue
         seen.add(p)
-        if p.endswith(FONT):
+        if p.endswith((FONT,) + AS_IS):
             if not os.path.exists(os.path.join(ROOT, p)):
-                sys.exit("font %s is missing; nothing was built" % p)
+                sys.exit("%s is missing; nothing was built" % p)
             continue
         with open(os.path.join(ROOT, p)) as fh:
             text = fh.read()
@@ -207,9 +213,10 @@ def main():
     ap.add_argument("--site", help="the live site, whose unlisted stories are kept")
     args = ap.parse_args()
     kept = kept_stories(args.site) if args.site else {}
-    reached = walk(PAGES + ["play/progress.js"])
+    reached = walk(PAGES + ["play/progress.js", CARD])
     fonts = [p for p in reached if p.endswith(FONT)]
-    files = [p for p in reached if not p.endswith(FONT)]
+    pictures = [p for p in reached if p.endswith(AS_IS)]
+    files = [p for p in reached if not p.endswith((FONT,) + AS_IS)]
     if "play/story/story.js" not in files:
         sys.exit("the game's module was not reached from the page")
     # Fonts never ship without their licence, nor a page that asks for a
@@ -218,7 +225,10 @@ def main():
         sys.exit("%s is missing; nothing was built" % LICENCE)
     for p in PAGES:
         with open(os.path.join(ROOT, p)) as fh:
-            fonts_asked(p, fh.read(), fonts)
+            page = fh.read()
+        fonts_asked(p, page, fonts)
+        if '/%s"' % CARD not in page:
+            sys.exit("%s does not name %s as the link's picture" % (p, CARD))
     # A library check.mjs faults (an older format, a broken verdict) never ships.
     if subprocess.run(["node", "check.mjs", "stories"], cwd=ROOT).returncode:
         sys.exit("check.mjs faults the library; nothing was built")
@@ -247,7 +257,7 @@ def main():
             if p.endswith(".html"):
                 os.makedirs(os.path.dirname(os.path.join(DIST, p)), exist_ok=True)
                 shutil.copy(os.path.join(tmp, p), os.path.join(DIST, p))
-    for p in fonts + [LICENCE]:
+    for p in fonts + pictures + [LICENCE]:
         os.makedirs(os.path.dirname(os.path.join(DIST, p)), exist_ok=True)
         shutil.copy(os.path.join(ROOT, p), os.path.join(DIST, p))
     os.makedirs(os.path.join(DIST, "stories"))
@@ -270,7 +280,8 @@ def main():
     with ProcessPoolExecutor(max(1, args.jobs)) as pool:
         sizes = list(pool.map(to_webp, jobs))
     with open(os.path.join(DIST, "_redirects"), "w") as fh:
-        fh.write("/ /play/ 302\n")
+        # A client that asks for the icon where no page names it gets the page's.
+        fh.write("/ /play/ 302\n/favicon.ico /play/icon-32.png 302\n")
     listed = len([f for f in os.listdir(os.path.join(ROOT, "stories")) if f.endswith(".json") and not f.endswith(".answer.json")]) - 1
     print("%d code files, %d fonts, %d stories (%d kept unlisted), %d images (%.0f MB as PNG, %.0f MB as WebP)" % (
         len(files), len(fonts), listed + len(kept), len(kept), len(jobs),

@@ -24,8 +24,8 @@ const OWN = new Set(GUESTS);
 // deploy/build.py reads this object as JSON, so it stays JSON.
 export const MOODS = {"ada": {"accused": 1}, "anselme": {"accused": 1}, "clementine": {"accused": 1}, "henrietta": {"accused": 1}, "ilya": {"accused": 1}, "lucian": {"accused": 1}, "ottilie": {"accused": 1}, "philippa": {"accused": 1}, "robin": {"accused": 1}, "sterling": {"accused": 1}, "terry": {"accused": 1}, "valentin": {"accused": 1}, "winnie": {"accused": 1}};
 // Where each guest's head is in their 1024x1536 portrait, set by eye: the
-// centre and side of a square around it, which cuts the dock icon
-// and the headshot of an accused or dead guest, and the
+// centre and side of a square around it, which cuts the headshot of an
+// accused or dead guest, and the
 // face's size as measured from a fitted face mesh (100 a
 // face at the cast's middle distance; Ada's, Clementine's, Henrietta's and
 // Ottilie's are set by eye against the others, since the mesh finds no
@@ -34,8 +34,8 @@ export const MOODS = {"ada": {"accused": 1}, "anselme": {"accused": 1}, "clement
 // (FACE_REF). The edits that make a
 // guest's mood pictures keep the portrait's framing, so one box serves them
 // all. A portrait redrawn needs its line looked at again, and a new guest
-// one of their own. The tool that cuts the icons reads this object as JSON,
-// so it stays JSON.
+// one of their own. The tool that measures the faces reads this object as
+// JSON, so it stays JSON.
 export const HEADS = {"ada": [512, 300, 380, 76], "anselme": [535, 395, 570, 114], "clementine": [512, 300, 520, 104], "henrietta": [490, 290, 560, 95], "ilya": [524, 375, 395, 79], "lucian": [461, 312, 390, 78], "ottilie": [500, 290, 470, 94], "philippa": [525, 315, 475, 95], "robin": [365, 361, 400, 80], "sterling": [523, 230, 390, 78], "terry": [430, 430, 540, 99], "valentin": [523, 445, 485, 97], "winnie": [491, 290, 440, 84], "narrator": [512, 330, 440, 111]};
 // Where each guest's head is in their accused picture, as in HEADS: the
 // centre and side of the square a charge shows. A picture redrawn needs
@@ -47,8 +47,7 @@ const OWN_HEAD = [512, 360, 680, 100];
 // The style of a figure: its zoom, so the heads of the cast come out one size.
 export const zoom = who => `--zoom: ${(FACE_REF / (HEADS[who] || OWN_HEAD)[3]).toFixed(3)}`;
 // The style of a headshot cut from a picture framed like the portrait
-// (story.css .head), the square kept inside the picture as the icon
-// cutter keeps it, so the icon and the headshot show one crop.
+// (story.css .head), the square kept inside the picture.
 export function head(who, mood) {
   let [cx, cy, side] = mood === "accused" && ACCUSED[who] || HEADS[who] || OWN_HEAD;
   cx = Math.min(Math.max(cx, side / 2), 1024 - side / 2);
@@ -61,8 +60,9 @@ export function head(who, mood) {
 // an account's figure stands elsewhere on a wide panel than on its plate,
 // that place in percent. A figure is art/drawn/set/<who>@<mood> and its
 // plate, the same canvas, <who>@<mood>-plate. A figure redrawn needs its
-// line measured again. deploy/build.py reads this object as JSON, so it
-// stays JSON.
+// line measured again and the character's icon cut again. deploy/build.py
+// and the tool that cuts the icons read this object as JSON, so it stays
+// JSON.
 export const SETS = {"ada": {"neutral": [25, 150, 28], "accusing": [76, 165, 13], "grave": [75, 168, 44]}, "anselme": {"neutral": [27, 193, 19], "accusing": [67, 206, 20], "grave": [67, 205, 12]}, "clementine": {"neutral": [21, 174, 11], "accusing": [77, 172, 11], "grave": [79, 163, 23]}, "henrietta": {"neutral": [31, 183, 25], "accusing": [68, 203, 18], "grave": [71, 193, 10]}, "ilya": {"neutral": [24, 200, 13], "accusing": [69, 201, 21], "grave": [70, 165, 21]}, "lucian": {"neutral": [28, 195, 20], "accusing": [68, 178, 29], "grave": [70, 166, 40]}, "ottilie": {"neutral": [29, 220, 13, 35], "accusing": [71, 179, 28], "grave": [70, 177, 59]}, "philippa": {"neutral": [32, 204, 10], "accusing": [67, 214, 39], "grave": [68, 177, 16]}, "robin": {"neutral": [25, 179, 32], "accusing": [68, 200, 60], "grave": [66, 184, 19]}, "sterling": {"neutral": [29, 194, 23], "accusing": [70, 200, 34], "grave": [67, 175, 43]}, "terry": {"neutral": [28, 193, 16], "accusing": [64, 205, 40], "grave": [65, 165, 35]}, "valentin": {"neutral": [27, 209, 9], "accusing": [64, 211, 26], "grave": [64, 191, 21]}, "winnie": {"neutral": [29, 210, 27], "accusing": [69, 204, 39], "grave": [68, 174, 32]}, "narrator": {"taut": [50, 200, 24], "lowered": [50, 200, 23], "look": [50, 200, 20], "smile": [50, 200, 21]}};
 // Every figure of a set is scaled so its face is this many rows of the
 // plate's 1024 tall, and its hair's top stands this many percent of the
@@ -120,8 +120,9 @@ function pick(key, n) {
 // The picture a headshot is cut from: a placeholder guest's closeup (the
 // head at OWN_HEAD), otherwise the picture given or the portrait.
 export const cutout = (who, src) => OWN.has(who) ? `${ART}/closeup-cut/${who}.png` : src || portrait(who);
-// The head alone, square and small, cut from the closeup,
-// for places that show a face at icon size.
+// The head alone, square and small, for places that show a face at icon
+// size. A character with a set (SETS) is cut from a figure of it, every
+// head one size; a placeholder guest from their closeup.
 export const icon = who => `${ART}/icon/${who}.png`;
 // The placeholder guests' own moods, as their files are named; their
 // examiner's picture is named "shocked".
